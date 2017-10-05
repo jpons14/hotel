@@ -5,7 +5,6 @@
 // Just used for widgets
 $GLOBALS['formAction'] = '/';
 
-echo 'before bootstrap'; die;
 // Used for everything less widgets
 define('FORM_ACTION', '/');
 
@@ -14,6 +13,7 @@ define('SYSTEM_ROOT', '' . FORM_ACTION);
 
 define('IMG_USERS', '' . FORM_ACTION . '/public/assets/img/users/');
 
+echo 'before bootstrap'; die;
 
 
 
