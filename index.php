@@ -2,18 +2,16 @@
 #### TEMPORAL ####
 
 //error_reporting( E_ALL ^ E_NOTICE);
-echo 'hotel';
-die;
 // Just used for widgets
-$GLOBALS['formAction'] = '/hotel';
+$GLOBALS['formAction'] = '/';
 
 // Used for everything less widgets
-define('FORM_ACTION', '/hotel');
+define('FORM_ACTION', '/');
 
-$GLOBALS['systemRoot'] = 'c:wamp64/www' . FORM_ACTION;
-define('SYSTEM_ROOT', 'c:wamp64/www' . FORM_ACTION);
+$GLOBALS['systemRoot'] = '' . FORM_ACTION;
+define('SYSTEM_ROOT', '' . FORM_ACTION);
 
-define('IMG_USERS', 'c:wamp64/www' . FORM_ACTION . '/public/assets/img/users/');
+define('IMG_USERS', '' . FORM_ACTION . '/public/assets/img/users/');
 
 
 
