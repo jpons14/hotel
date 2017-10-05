@@ -13,11 +13,11 @@ define('SYSTEM_ROOT', '' . FORM_ACTION);
 
 define('IMG_USERS', '' . FORM_ACTION . '/public/assets/img/users/');
 
-echo 'before bootstrap'; die;
 
 
 
 $GLOBALS['controllerAndAction'] = include 'private/permissions/controllerAndAction.php';
+echo 'before bootstrapfff'; die;
 $GLOBALS['usersPermission'] = include 'private/permissions/users.php';
 
 $GLOBALS['db'] = include 'private/settings/database.php';
