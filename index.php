@@ -20,9 +20,9 @@ $GLOBALS['controllerAndAction'] = include 'private/permissions/controllerAndActi
 $GLOBALS['usersPermission'] = include 'private/permissions/users.php';
 
 $GLOBALS['db'] = include 'private/settings/database.php';
-echo 'before bootstrapffffffffffffffff'; die;
 include 'httpful.phar';
 
+echo 'before bootstrapd'; die;
 foreach ( glob( __DIR__ . '/private/core/*.php' ) as $item ) {
     require_once $item;
 }
