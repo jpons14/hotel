@@ -16,6 +16,7 @@ define('IMG_USERS', '' . FORM_ACTION . '/public/assets/img/users/');
 
 
 
+echo 'before bootstrap'; die;
 $GLOBALS['controllerAndAction'] = include 'private/permissions/controllerAndAction.php';
 $GLOBALS['usersPermission'] = include 'private/permissions/users.php';
 
@@ -42,5 +43,4 @@ foreach ( glob( __DIR__ . '/private/exceptions/*.php' ) as $item ) {
     require_once $item;
 }
 
-echo 'before bootstrap'; die;
 $bootstrap = new Bootstrap();
