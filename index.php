@@ -42,5 +42,5 @@ foreach ( glob( __DIR__ . '/private/exceptions/*.php' ) as $item ) {
     require_once $item;
 }
 
-
+echo 'before bootstrap'; die;
 $bootstrap = new Bootstrap();
