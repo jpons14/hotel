@@ -8,12 +8,13 @@ class Bookings extends Controller {
 
     public function index() {
         $booking = new Booking();
-        $elements = $booking->getAllBookings( [ 'id', 'user_email', 'book_id', 'pick_up', 'pick_off' ] );
-        $returneds = $booking->getAllBookings( [ 'returned' ] );
+        $booking->getAllBookings();
+//        $elements = $booking->getAllBookings( [ 'id', 'fk_users_dni_dni', 'start_date', 'end_date' ] );
+//        $returneds = $booking->getAllBookings( [ 'returned' ] );
 
 
-        $book = new Book();
-        $books = $book->getAll();
+//        $book = new Book();
+//        $books = $book->getAll();
 
         foreach( $elements as $index => $element ) {
             if( $returneds[ $index ][ 0 ] == 1 ) {

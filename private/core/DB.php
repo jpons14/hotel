@@ -27,6 +27,11 @@ class DB {
      */
     protected $fields = [];
 
+    /**
+     * @var array
+     */
+    private $rawFields = [];
+
 
     /**
      * Define if the table has timestamps or not
@@ -40,22 +45,20 @@ class DB {
      */
     protected $hasId = true;
 
-    /**
-     * @var array
-     */
-    protected $fks = array();
-
 
     /**
      * Model constructor.
      * @param string $charset
+     * @param bool $hasFk
+     * @param array $fks
      * @throws DBException
      */
-    public function __construct( $charset = 'UTF8' ) {
+    public function __construct( $charset = 'UTF8', $hasFk = false, $fks = [] ) {
         $this->host = $GLOBALS[ 'db' ][ 'host' ];
         $this->username = $GLOBALS[ 'db' ][ 'user_name' ];
         $this->password = $GLOBALS[ 'db' ][ 'user_password' ];
         $this->db = $GLOBALS[ 'db' ][ 'db_name' ];
+
 
         $this->connection = new mysqli( $this->host, $this->username, $this->password, $this->db );
         $this->connection->set_charset( $charset );
@@ -68,7 +71,15 @@ class DB {
     }
 
     protected function setFields( $fields ) {
-        $this->fields = $fields;
+        if(!isset($this->table) || $this->table == '')
+            throw new VarNoInitializedException('$this->table is not initialized or is not set');
+
+        $this->rawFields = $fields;
+
+
+        foreach( $fields as $field ) {
+            $this->fields[] = $this->table . '.' . $field;
+        }
     }
 
     /**
@@ -89,9 +100,48 @@ class DB {
         if( !is_array( $fields ) )
             throw new DBException( '$fields Has to be an array' );
 
+
+//        $temporal = [];
+
+//        foreach( $fields as $field ) {
+//            $temporal[] = $this->table . '.' . $field;
+//        }
+
+//        $fields = $temporal;
+        
         $toReturn = implode( ',', $fields );
-        $sql = 'SELECT ' . $toReturn . ' FROM ' . $this->table;
+        
+//        $fks = [];
+//        $tt = '';
+//        foreach( $fields as $field ) {
+//            if( strpos( $field, 'fk' ) !== false ) {
+//                $fks[] = $field;
+//                $tt = $field;
+//            }
+//        }
+//
+//        $tmp = explode( '_', $fks[ 0 ] );
+
+        $sql = "SELECT {$toReturn},";
+
+        $sql .= $this->prepare2AddFks2Select();
+
+        $sql .= " FROM {$this->table},";
+
+        $sql .= $this->prepare2AddFks2From();
+
+        $sql .= ' WHERE ' . $this->prepare2AddFks2Where();
+
+//        if( !empty( $fks ) )
+//            $sql = 'SELECT ' . $toReturn . ', ' . $tmp[ 1 ] . '.' . $tmp[ 3 ] . ' FROM ' . $this->table . ', ' . $tmp[ 1 ] . " WHERE $tmp[1].$tmp[3] = $tt";
+//        else
+//            $sql = 'SELECT ' . $toReturn . ' FROM ' . $this->table;
+//
+
+        echo '<pre>$sql' . print_r( $sql, true ) . '</pre>';die;
+
         $result = $this->executeQuery( $sql );
+
 
         return $result;
     }
@@ -109,18 +159,40 @@ class DB {
         return $this->executeQuery( $sql );
     }
 
-    public function where( $fieldName, $value, $table = '' ) {
-        if( !is_string( $fieldName ) || $fieldName == null )
+    public function where( $fieldNameWhere, $valueWhere, $fields = [], $table = '' ) {
+        if( !is_string( $fieldNameWhere ) || $fieldNameWhere == null )
             throw new DBException( '$fieldName has to be a String' );
-        if( !is_string( $value ) || $value == null )
+        if( !is_string( $valueWhere ) || $valueWhere == null )
             throw new DBException( '$value has to be a String' );
         if( $table != '' )
             $this->setTable( $table );
+        if( $fields == [] )
+            $fields = $this->fields;
 
+        $temporal = [];
 
-        $sql = "SELECT * FROM $this->table WHERE `$fieldName` = '$value' ";
+        foreach( $fields as $field ) {
+            $temporal[] = $this->table . '.' . $field;
+        }
 
+        $fields = $temporal;
 
+        $toReturn = implode( ',', $fields );
+        $fks = [];
+        $tt = '';
+        foreach( $fields as $field ) {
+            if( strpos( $field, 'fk' ) !== false ) {
+                $fks[] = $field;
+                $tt = $field;
+            }
+        }
+
+        $tmp = explode( '_', $fks[ 0 ] );
+
+        if(!empty( $fks ))
+            $sql = "SELECT $toReturn, {$tmp[1]}.{$tmp[3]} FROM $this->table, $tmp[1]  WHERE `$fieldNameWhere` = '$valueWhere' AND $tmp[1].id = $tt";
+        else
+            $sql = "SELECT * FROM $this->table WHERE `$fieldNameWhere` = '$valueWhere'";
         return $this->executeQuery( $sql );
     }
 
@@ -141,19 +213,45 @@ class DB {
 
 
 
-    public function whereOrderBy( $fieldName, $value, $order = 'ASC', $orderBy = 'id', $table = '' ) {
+    public function whereOrderBy( $fieldName, $value, $fields = [], $order = 'ASC', $orderBy = 'id', $table = '' ) {
         if( !is_string( $fieldName ) || $fieldName == null )
             throw new DBException( '$fieldName has to be a String' );
         if( !is_string( $value ) || $value == null )
             throw new DBException( '$value has to be a String' );
         if( $table != '' )
             $this->setTable( $table );
+        if($fields == [])
+            $fields = $this->fields;
+
+        $temporal = [];
+
+        foreach( $fields as $field ) {
+            $temporal[] = $this->table . '.' . $field;
+        }
+
+        $fields = $temporal;
+
+        $toReturn = implode( ',', $fields );
+        $fks = [];
+        $tt = '';
+        foreach( $fields as $field ) {
+            if( strpos( $field, 'fk' ) !== false ) {
+                $fks[] = $field;
+                $tt = $field;
+            }
+        }
+
+        $tmp = explode( '_', $fks[ 0 ] );
 
         $fields = implode( ', ', $this->fields );
 
-        $sql = "SELECT $fields FROM $this->table WHERE `$fieldName` = '$value' ORDER BY $orderBy $order";
+        if( !empty( $fks ) )
+            $sql = "SELECT $fields, {$tmp[1]}.{$tmp[3]} FROM $this->table, $tmp[1] WHERE `$fieldName` = '$value' AND $tmp[1].id = $tt ORDER BY $orderBy $order";
+        else
+            $sql = "SELECT $fields FROM $this->table WHERE `$fieldName` = '$value' ORDER BY $orderBy $order";
 
-
+        echo '<pre>$sql' . print_r( $sql, true ) . '</pre>';
+        
         return $this->executeQuery( $sql );
     }
 
@@ -243,6 +341,71 @@ class DB {
         $this->executeUpdate( $sql );
 
         return;
+    }
+
+
+    private function splitFks($rawFields, &$rawFks = []){
+        $fks = [];
+        foreach( $rawFields as $field ) {
+            if( strpos( $field, 'fk' ) !== false ) {
+                $rawFks[] = $field;
+                $fks[] = explode('_', $field);
+            }
+        }
+        return $fks;
+
+    }
+
+    private function prepare2AddFks2Select($rawFields = []){
+        if(!is_array($rawFields))
+            throw new NoCompatibleVarTypeException('$rawFields is not an array');
+        if($rawFields === [])
+            $rawFields = $this->rawFields;
+
+
+        $fks = $this->splitFks($rawFields);
+        $selects = [];
+        
+        foreach( $fks as $fk ) {
+            $selects[] = $fk[1] . '.`' . $fk[3] . '`';
+        }
+
+        return implode(',', $selects);
+    }
+
+    private function prepare2AddFks2From($rawFields = []){
+        if(!is_array($rawFields))
+            throw new NoCompatibleVarTypeException('$rawFields is not an array');
+        if($rawFields === [])
+            $rawFields = $this->rawFields;
+
+        $fks = $this->splitFks($rawFields);
+
+        $from = [];
+
+        foreach( $fks as $fk ) {
+            $from[] = $fk[1];
+        }
+
+        return implode(',', $from);
+    }
+
+    private function prepare2AddFks2Where( $rawFields = [] ) {
+        if(!is_array($rawFields))
+            throw new NoCompatibleVarTypeException('$rawFields is not an array');
+        if($rawFields === [])
+            $rawFields = $this->rawFields;
+
+
+        $rawFks = [];
+        $fks = $this->splitFks($rawFields, $rawFks);
+
+        $wheres = [];
+        foreach( $fks as $index => $fk ) {
+            $wheres[] = "{$this->table}.{$rawFks[$index]} = {$fk[1]}.{$fk[2]}";
+        }
+
+        return implode(' AND ', $wheres);
     }
 
     /**

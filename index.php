@@ -1,17 +1,18 @@
 <?php
 #### TEMPORAL ####
 
-//error_reporting( E_ALL ^ E_NOTICE);
+error_reporting( E_ALL ^ E_NOTICE);
+
 // Just used for widgets
-$GLOBALS['formAction'] = '/';
+$GLOBALS['formAction'] = '/hotel';
 
 // Used for everything less widgets
-define('FORM_ACTION', '/');
+define('FORM_ACTION', '/hotel');
 
-$GLOBALS['systemRoot'] = '' . FORM_ACTION;
-define('SYSTEM_ROOT', '' . FORM_ACTION);
+$GLOBALS['systemRoot'] = 'c:wamp64/www' . FORM_ACTION;
+define('SYSTEM_ROOT', 'c:wamp64/www' . FORM_ACTION);
 
-define('IMG_USERS', '' . FORM_ACTION . '/public/assets/img/users/');
+define('IMG_USERS', 'c:wamp64/www' . FORM_ACTION . '/public/assets/img/users/');
 
 
 
@@ -22,7 +23,6 @@ $GLOBALS['usersPermission'] = include 'private/permissions/users.php';
 $GLOBALS['db'] = include 'private/settings/database.php';
 include 'httpful.phar';
 
-echo 'before bootstrapd'; die;
 foreach ( glob( __DIR__ . '/private/core/*.php' ) as $item ) {
     require_once $item;
 }

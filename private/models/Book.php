@@ -25,7 +25,7 @@ class Book extends DB {
      * @return array|null
      */
     public function getAll() {
-        return $this->select();
+        $tmp =  $this->select();
     }
 
     public function searchByName( $name ) {

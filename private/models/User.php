@@ -34,7 +34,7 @@ class User extends DB {
         $this->email = $email;
         $this->justEmail = false;
         try {
-            $this->fields = [ 'dni', 'name', 'surnames', 'email', 'phone', 'user_type_id', 'password' ];
+            $this->fields = [ 'dni', 'name', 'surnames', 'email', 'phone', 'password', 'fk_usertypes_id_usertypename' ];
             if( $name == '' && $password == '' ) {
                 $this->justEmail = true;
             } else {
@@ -171,7 +171,7 @@ class User extends DB {
         $this->surnames = $return[ 0 ][ 2 ];
         $this->email = $return[ 0 ][ 3 ];
         $this->phone = $return[ 0 ][ 4 ];
-        $this->userType = $return[ 0 ][ 6 ];
+        $this->userType = $return[ 0 ][ 7 ];
 
         return $return;
     }
@@ -251,6 +251,11 @@ class User extends DB {
         $this->setTable( 'users' );
 
         return $this->select( $select );
+    }
+
+    public function getAll(  ) {
+        $this->setTable( 'users' );
+        $this->select();
     }
 
 }

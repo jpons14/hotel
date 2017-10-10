@@ -7,8 +7,13 @@ class Booking extends DB {
     public function __construct( $charset = 'UTF8' ) {
         parent::__construct( $charset );
         $this->setTable( 'bookings' );
-        $this->setFields( [ 'id', 'book_id', 'user_email', 'pick_up', 'pick_off' ] );
 
+        try {
+            $this->setFields( [ 'id', 'start_date', 'end_date', 'confirmed', 'pay_method', 'paid', 'adults_number', 'children_number', 'fk_users_dni_dni' ] );
+        } catch(VarNoInitializedException $e){
+            $e->showException();
+        }
+        
         $this->conservation = [
             'old' => 5,
             'normal' => 10,
@@ -79,8 +84,9 @@ class Booking extends DB {
         ## TODO: refactor
         $all = $this->where( 'user_email', $email );
         foreach( $all as $index => $item ) {
-            unset($all[$index][5]);
+            unset( $all[ $index ][ 5 ] );
         }
+
         return $all;
     }
 
@@ -88,12 +94,13 @@ class Booking extends DB {
         ## TODO: refactor
         $all = $this->where( 'book_id', $id );
         foreach( $all as $index => $item ) {
-            unset($all[$index][5]);
+            unset( $all[ $index ][ 5 ] );
         }
+
         return $all;
     }
 
-    public function return ( $id ) {
+    public function return( $id ) {
         return $this->update( [ 'returned' => 1 ], $id );
     }
 

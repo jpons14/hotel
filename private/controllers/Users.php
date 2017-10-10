@@ -8,6 +8,10 @@ class Users extends Controller {
 
     // Permission = true
     public function login() {
+
+        $user = new User('jponspons@gmail.com');
+        $user->getAll();
+
         $view = new View( [ 'loginForm' ] );
     }
 
