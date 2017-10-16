@@ -12,7 +12,7 @@ define('FORM_ACTION', '/hotel');
 $GLOBALS['systemRoot'] = 'c:wamp64/www' . FORM_ACTION;
 define('SYSTEM_ROOT', 'c:wamp64/www' . FORM_ACTION);
 
-define('IMG_USERS', 'c:wamp64/www' . FORM_ACTION . '/public/assets/img/users/');
+define('IMG_USERS', 'c:wamp64/www' . FORM_ACTION     . '/public/assets/img/users/');
 
 
 
