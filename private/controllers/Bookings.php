@@ -9,7 +9,7 @@ class Bookings extends Controller {
     public function index() {
         $booking = new Booking();
         $booking->getAllBookings();
-//        $elements = $booking->getAllBookings( [ 'id', 'fk_users_dni_dni', 'start_date', 'end_date' ] );
+        $elements = $booking->getAllBookings( [ 'id', 'fk_users_dni_dni', 'start_date', 'end_date' ] );
 //        $returneds = $booking->getAllBookings( [ 'returned' ] );
 
 

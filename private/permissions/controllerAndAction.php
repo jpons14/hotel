@@ -34,6 +34,7 @@ return [
         'index' => 300
     ],
     'Rooms' => [
-        'index' => 200
+        'index' => 200,
+        'create' => 200
     ]
 ];

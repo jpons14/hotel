@@ -141,14 +141,14 @@ class Users extends Controller {
 
     public function allUsers() {
         $user = new User( $this->session->getVar( 'userEmail' ) );
-        $all = $user->getAllUsers( [ 'id', 'name', 'email' ] );
+        $all = $user->getAllUsers( [ 'dni', 'name', 'email' ] );
         new View( [ 'header' ] );
         new View( [], [], [ 'MenuWidget' => [
             'userType' => $this->session->getVar( 'userType' )
         ] ] );
 
         new View( [ 'buttonNewUser' ], [], [ 'TableWidget' => [
-            'fields' => [ 'id', 'name', 'email', 'edit', 'delete' ],
+            'fields' => [ 'dni', 'name', 'email', 'edit', 'delete' ],
             'values' => $all,
             'editable' => true,
             'editURI' => '/users/edit?email=',

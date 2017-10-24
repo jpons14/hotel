@@ -4,15 +4,17 @@
 error_reporting( E_ALL ^ E_NOTICE);
 
 // Just used for widgets
-$GLOBALS['formAction'] = '/hotel';
+$GLOBALS['formAction'] = '';
 
 // Used for everything less widgets
-define('FORM_ACTION', '/hotel');
+define('FORM_ACTION', '');
 
-$GLOBALS['systemRoot'] = 'c:wamp64/www' . FORM_ACTION;
-define('SYSTEM_ROOT', 'c:wamp64/www' . FORM_ACTION);
+define('ABSOLUTE_PATH', '/hotel');
 
-define('IMG_USERS', 'c:wamp64/www' . FORM_ACTION     . '/public/assets/img/users/');
+$GLOBALS['systemRoot'] = 'c:wamp64/www' . ABSOLUTE_PATH;
+define('SYSTEM_ROOT', 'c:wamp64/www' . ABSOLUTE_PATH);
+
+define('IMG_USERS', 'c:wamp64/www' . ABSOLUTE_PATH     . '/public/assets/img/users/');
 
 
 
@@ -24,6 +26,10 @@ $GLOBALS['db'] = include 'private/settings/database.php';
 include 'httpful.phar';
 
 foreach ( glob( __DIR__ . '/private/core/*.php' ) as $item ) {
+    require_once $item;
+}
+
+foreach ( glob( __DIR__ . '/private/interfaces/*.php' ) as $item ) {
     require_once $item;
 }
 

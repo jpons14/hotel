@@ -3,12 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Register</title>
-    <link rel="stylesheet" href="/assets/css/style.css" />
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
-            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-            crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="[[ formAction ]]/public/assets/css/style.css" />
+    <link rel="stylesheet" href="[[ formAction ]]/public/assets/bootstrap-4.0.0-alpha.6-dist/css/bootstrap.min.css" />
+    <script src="[[ formAction ]]/public/assets/bootstrap-4.0.0-alpha.6-dist/js/bootstrap.min.js"></script>
+
 </head>
 <body>
 <div class="container">

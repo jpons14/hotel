@@ -16,6 +16,7 @@ class Book extends DB {
     }
 
     public function getConservationById( $id ) {
+
         $return = $this->where( 'id', $id );
 
         return $return[ 0 ][ 4 ];
@@ -25,7 +26,7 @@ class Book extends DB {
      * @return array|null
      */
     public function getAll() {
-        $tmp =  $this->select();
+        return $this->select();
     }
 
     public function searchByName( $name ) {

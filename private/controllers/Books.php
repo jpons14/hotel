@@ -20,6 +20,9 @@ class Books extends Controller {
             'userType' => $this->session->getVar( 'userType' )
         ] ] );
         new View( [ 'searchBooks' ] );
+
+        echo '<pre>[1,2,3]' . print_r( [1,2,3], true ) . '</pre>';
+        
     }
 
     public function home(  ) {

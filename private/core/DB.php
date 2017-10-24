@@ -45,6 +45,7 @@ class DB {
      */
     protected $hasId = true;
 
+    private $dontShowIfOfFk = false;
 
     /**
      * Model constructor.
@@ -71,8 +72,8 @@ class DB {
     }
 
     protected function setFields( $fields ) {
-        if(!isset($this->table) || $this->table == '')
-            throw new VarNoInitializedException('$this->table is not initialized or is not set');
+        if( !isset( $this->table ) || $this->table == '' )
+            throw new VarNoInitializedException( '$this->table is not initialized or is not set' );
 
         $this->rawFields = $fields;
 
@@ -101,47 +102,59 @@ class DB {
             throw new DBException( '$fields Has to be an array' );
 
 
-//        $temporal = [];
+        //        $temporal = [];
 
-//        foreach( $fields as $field ) {
-//            $temporal[] = $this->table . '.' . $field;
-//        }
+        //        foreach( $fields as $field ) {
+        //            $temporal[] = $this->table . '.' . $field;
+        //        }
 
-//        $fields = $temporal;
-        
-        $toReturn = implode( ',', $fields );
-        
-//        $fks = [];
-//        $tt = '';
-//        foreach( $fields as $field ) {
-//            if( strpos( $field, 'fk' ) !== false ) {
-//                $fks[] = $field;
-//                $tt = $field;
-//            }
-//        }
-//
-//        $tmp = explode( '_', $fks[ 0 ] );
+        //        $fields = $temporal;
 
-        $sql = "SELECT {$toReturn},";
+        $fieldsTmp = $fields;
+        foreach( $fieldsTmp as $index => $item ) {
+            if( strpos( $item, 'fk' ) !== false ) {
+                unset($fieldsTmp[$index]);
+                $this->dontShowIfOfFk = true;
+            }
+        }
 
-        $sql .= $this->prepare2AddFks2Select();
+        if(count($fieldsTmp) > 1)
+            $this->dontShowIfOfFk = false;
 
-        $sql .= " FROM {$this->table},";
+        $toReturn = implode( ',', $fieldsTmp );
 
-        $sql .= $this->prepare2AddFks2From();
+        //        $fks = [];
+        //        $tt = '';
+        //        foreach( $fields as $field ) {
+        //            if( strpos( $field, 'fk' ) !== false ) {
+        //                $fks[] = $field;
+        //                $tt = $field;
+        //            }
+        //        }
+        //
+        //        $tmp = explode( '_', $fks[ 0 ] );
 
-        $sql .= ' WHERE ' . $this->prepare2AddFks2Where();
 
-//        if( !empty( $fks ) )
-//            $sql = 'SELECT ' . $toReturn . ', ' . $tmp[ 1 ] . '.' . $tmp[ 3 ] . ' FROM ' . $this->table . ', ' . $tmp[ 1 ] . " WHERE $tmp[1].$tmp[3] = $tt";
-//        else
-//            $sql = 'SELECT ' . $toReturn . ' FROM ' . $this->table;
-//
+        $separator = ',';
 
-        echo '<pre>$sql' . print_r( $sql, true ) . '</pre>';die;
+        if($this->dontShowIfOfFk)
+            $separator = '';
+        $sql = "SELECT {$toReturn}{$separator} ";
+
+        $sql .= $this->prepare2AddFks2Select($fields);
+
+        $sql .= " FROM {$this->table}, ";
+
+        $sql .= $this->prepare2AddFks2From($fields);
+
+        $foo = false;
+        $this->splitFks( $this->rawFields, $foo );
+
+        if($foo)
+            $sql .= ' WHERE ' . $this->prepare2AddFks2Where($fields);
+
 
         $result = $this->executeQuery( $sql );
-
 
         return $result;
     }
@@ -189,10 +202,11 @@ class DB {
 
         $tmp = explode( '_', $fks[ 0 ] );
 
-        if(!empty( $fks ))
+        if( !empty( $fks ) )
             $sql = "SELECT $toReturn, {$tmp[1]}.{$tmp[3]} FROM $this->table, $tmp[1]  WHERE `$fieldNameWhere` = '$valueWhere' AND $tmp[1].id = $tt";
         else
             $sql = "SELECT * FROM $this->table WHERE `$fieldNameWhere` = '$valueWhere'";
+
         return $this->executeQuery( $sql );
     }
 
@@ -212,7 +226,6 @@ class DB {
     }
 
 
-
     public function whereOrderBy( $fieldName, $value, $fields = [], $order = 'ASC', $orderBy = 'id', $table = '' ) {
         if( !is_string( $fieldName ) || $fieldName == null )
             throw new DBException( '$fieldName has to be a String' );
@@ -220,7 +233,7 @@ class DB {
             throw new DBException( '$value has to be a String' );
         if( $table != '' )
             $this->setTable( $table );
-        if($fields == [])
+        if( $fields == [] )
             $fields = $this->fields;
 
         $temporal = [];
@@ -251,7 +264,7 @@ class DB {
             $sql = "SELECT $fields FROM $this->table WHERE `$fieldName` = '$value' ORDER BY $orderBy $order";
 
         echo '<pre>$sql' . print_r( $sql, true ) . '</pre>';
-        
+
         return $this->executeQuery( $sql );
     }
 
@@ -344,68 +357,76 @@ class DB {
     }
 
 
-    private function splitFks($rawFields, &$rawFks = []){
+    private function splitFks( $rawFields, &$rawFks = [] ) {
         $fks = [];
         foreach( $rawFields as $field ) {
             if( strpos( $field, 'fk' ) !== false ) {
                 $rawFks[] = $field;
-                $fks[] = explode('_', $field);
+                $fks[] = explode( '_', $field );
             }
         }
+
         return $fks;
 
     }
 
-    private function prepare2AddFks2Select($rawFields = []){
-        if(!is_array($rawFields))
-            throw new NoCompatibleVarTypeException('$rawFields is not an array');
-        if($rawFields === [])
+    private function prepare2AddFks2Select( $rawFields = [] ) {
+        if( !is_array( $rawFields ) )
+            throw new NoCompatibleVarTypeException( '$rawFields is not an array' );
+        if( $rawFields === [] )
             $rawFields = $this->rawFields;
 
 
-        $fks = $this->splitFks($rawFields);
+        $fks = $this->splitFks( $rawFields );
         $selects = [];
-        
+
         foreach( $fks as $fk ) {
-            $selects[] = $fk[1] . '.`' . $fk[3] . '`';
+            $selects[] = $fk[ 1 ] . '.`' . $fk[ 3 ] . '`';
         }
 
-        return implode(',', $selects);
+        return implode( ',', $selects );
     }
 
-    private function prepare2AddFks2From($rawFields = []){
-        if(!is_array($rawFields))
-            throw new NoCompatibleVarTypeException('$rawFields is not an array');
-        if($rawFields === [])
+    private function prepare2AddFks2From( $rawFields = [] ) {
+        if( !is_array( $rawFields ) )
+            throw new NoCompatibleVarTypeException( '$rawFields is not an array' );
+        if( $rawFields === [] )
             $rawFields = $this->rawFields;
 
-        $fks = $this->splitFks($rawFields);
+        $fks = $this->splitFks( $rawFields );
 
         $from = [];
 
         foreach( $fks as $fk ) {
-            $from[] = $fk[1];
+            $from[] = $fk[ 1 ];
         }
 
-        return implode(',', $from);
+        return implode( ',', $from );
     }
 
     private function prepare2AddFks2Where( $rawFields = [] ) {
-        if(!is_array($rawFields))
-            throw new NoCompatibleVarTypeException('$rawFields is not an array');
-        if($rawFields === [])
+        if( !is_array( $rawFields ) )
+            throw new NoCompatibleVarTypeException( '$rawFields is not an array' );
+        if( $rawFields === [] )
             $rawFields = $this->rawFields;
 
 
         $rawFks = [];
-        $fks = $this->splitFks($rawFields, $rawFks);
+        $fks = $this->splitFks( $rawFields, $rawFks );
+
+        $table = '';
 
         $wheres = [];
         foreach( $fks as $index => $fk ) {
-            $wheres[] = "{$this->table}.{$rawFks[$index]} = {$fk[1]}.{$fk[2]}";
+            if($this->dontShowIfOfFk){
+                $table = $this->table . '.';
+            }
+            $wheres[] = "{$table}{$rawFks[$index]} = {$fk[1]}.{$fk[2]}";
         }
 
-        return implode(' AND ', $wheres);
+
+
+        return implode( ' AND ', $wheres );
     }
 
     /**
@@ -421,6 +442,7 @@ class DB {
      * @return bool|mysqli_result
      */
     private function executeUpdate( $sql ) {
+
         return mysqli_query( $this->connection, $sql );
     }
 }

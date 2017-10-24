@@ -9,7 +9,7 @@ class Booking extends DB {
         $this->setTable( 'bookings' );
 
         try {
-            $this->setFields( [ 'id', 'start_date', 'end_date', 'confirmed', 'pay_method', 'paid', 'adults_number', 'children_number', 'fk_users_dni_dni' ] );
+            $this->setFields( [ 'id', 'start_date', 'end_date', 'confirmed', 'pay_method', 'paid', 'adults_number', 'children_number', 'fk_users_dni_dni', 'fk_rooms_id_name' ] );
         } catch(VarNoInitializedException $e){
             $e->showException();
         }
@@ -23,6 +23,7 @@ class Booking extends DB {
     }
 
     public function getAllBookings( $elements = [] ) {
+        echo '<pre>$elements' . print_r( $elements, true ) . '</pre>';
         return $this->select( $elements );
     }
 
