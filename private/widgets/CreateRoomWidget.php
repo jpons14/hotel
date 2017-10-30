@@ -6,6 +6,13 @@ class CreateRoomWidget extends FatherWidget {
         parent::__construct( $vars );
     }
 
+    public function generateOptionsRoomTypes( &$string ) {
+        foreach( $this->vars as $var ) {
+            foreach( $var as $item ) {
+                $string .= "<option value='$item[0]'>$item[0]</option>";
+            }
+        }
+    }
 
     public function __toString() {
         $string = '<br /><div class="container">
@@ -14,19 +21,24 @@ class CreateRoomWidget extends FatherWidget {
                     <input class="form-control" type="text" placeholder="Name" name="name" value="' . $this->vars[ 'userName' ] . '"/>
                 </div>
                 <div class="form-group">
-                <label for="userType"></label>
-                    <select class="form-control" name="userType" id="userType">
-                        <option value="member">member</option>
-                        <option value="librarian">librarian</option>
-                        <option value="root">root</option>
+                <label for="roomType"></label>
+                    <select class="form-control" name="roomType" id="roomType"> 
+                    ';
+        $this->generateOptionsRoomTypes($string);
+        $string .= '
                     </select>
                 </div>
                 <div class="form-group">
-                    <input type="text" class="form-control" name="address" placeholder="Address" value="tmp no working">
-                </div>
+                    <select class="form-control" name="roomType2" id="roomType2">   
+                    <option value="" selected disabled>Select a room type</option>  
+                                </select>
+                                </div>
                 <div class="form-group">
-                    <input type="text" class="form-control" name="phone" placeholder="Phone" value="tmp no working">
-                </div>
+                    <select class="form-control" name="roomType3" id="roomType3">   
+                    <option value="" selected disabled>Select a room type</option>  
+                            
+                            </select>        
+                      </div>
                 <input class="btn btn-default" type="submit" value="Update user!"/>
             </form>
         </div>';

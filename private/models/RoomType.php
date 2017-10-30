@@ -6,6 +6,25 @@
  * Time: 15:34
  */
 
-class RoomType {
+class RoomType extends DB{
+    public function __construct( ) {
+        parent::__construct( );
+        $this->setTable('roomtypes');
+        $this->setFields(['id', 'name', 'price']);
+    }
+
+    public function getAll(  ) {
+        return $this->select();
+    }
+
+    public function __set( $name, $value ) {
+        // TODO: Implement __set() method.
+    }
+
+
+    public function __get( $name ) {
+        return $this->select([$name]);
+    }
+
 
 }

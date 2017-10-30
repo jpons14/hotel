@@ -27,6 +27,7 @@ class Session {
         foreach( $_SESSION as $index => $item ) {
             unset( $_SESSION[ 'index' ] );
         }
+
     }
 
     public function destroy() {
@@ -34,5 +35,7 @@ class Session {
         session_destroy();
         session_unset();
     }
+
+
 
 }

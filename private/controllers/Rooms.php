@@ -43,10 +43,13 @@ class Rooms extends Controller implements ResourceInterface {
         $room = new Room();
         $all = $room->getOnParamether('fk_roomtypes_id_name');
 
-        echo '<pre>$all' . print_r( $all, true ) . '</pre>';
-        
-        new View([],[],['CreateRoomWidget' => [
+        $roomTypes = new RoomType();
 
+        $types = $roomTypes->name;
+
+
+        new View(['roomTypesJS'],[],['CreateRoomWidget' => [
+            'roomTypes' => $types
         ]]);
 
     }
