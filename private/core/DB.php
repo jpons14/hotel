@@ -110,40 +110,38 @@ class DB {
 
         //        $fields = $temporal;
 
+        $differentTables = false;
+
         $fieldsTmp = $fields;
         foreach( $fieldsTmp as $index => $item ) {
             if( strpos( $item, 'fk' ) !== false ) {
+                $differentTables = true;
                 unset($fieldsTmp[$index]);
                 $this->dontShowIfOfFk = true;
             }
         }
 
+
+        $separatorTables = '';
+
         if(count($fieldsTmp) > 1)
             $this->dontShowIfOfFk = false;
+        if($differentTables)
+            $separatorTables = ',';
 
         $toReturn = implode( ',', $fieldsTmp );
-
-        //        $fks = [];
-        //        $tt = '';
-        //        foreach( $fields as $field ) {
-        //            if( strpos( $field, 'fk' ) !== false ) {
-        //                $fks[] = $field;
-        //                $tt = $field;
-        //            }
-        //        }
-        //
-        //        $tmp = explode( '_', $fks[ 0 ] );
 
 
         $separator = ',';
 
-        if($this->dontShowIfOfFk)
+        if($this->dontShowIfOfFk || count($fields) >= 1)
             $separator = '';
+
         $sql = "SELECT {$toReturn}{$separator} ";
 
         $sql .= $this->prepare2AddFks2Select($fields);
 
-        $sql .= " FROM {$this->table}, ";
+        $sql .= " FROM {$this->table}{$separatorTables}";
 
         $sql .= $this->prepare2AddFks2From($fields);
 
