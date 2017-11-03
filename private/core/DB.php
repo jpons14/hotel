@@ -90,6 +90,27 @@ class DB {
         return count( $this->fields );
     }
 
+
+    private function tmpFunc( $fields ) {
+        $fieldsTmp = $fields;
+        $f = [];
+        foreach( $fieldsTmp as $index => $item ) {
+            if( strpos( $item, 'fk' ) !== false ) {
+                $differentTables = true;
+                unset($fieldsTmp[$index]);
+                $f[] = $item;
+            }
+        }
+        if(count($f) > 0)
+        $this->dontShowIfOfFk = false;
+        $separator = '';
+        if(count($fieldsTmp) > 0 && count($f) > 0)
+            $separator = ',';
+        $toReturn = implode( ',', $fieldsTmp );
+        $sql = "SELECT {$toReturn}{$separator} ";
+        return $sql;
+    }
+
     /**
      * @param array $fields
      * @return array|null
@@ -113,29 +134,35 @@ class DB {
         $differentTables = false;
 
         $fieldsTmp = $fields;
+        $f = [];
         foreach( $fieldsTmp as $index => $item ) {
             if( strpos( $item, 'fk' ) !== false ) {
                 $differentTables = true;
                 unset($fieldsTmp[$index]);
-                $this->dontShowIfOfFk = true;
+                $f[] = $item;
             }
         }
 
+        if(count($f) > 0)
+            $this->dontShowIfOfFk = false;
 
         $separatorTables = '';
 
-        if(count($fieldsTmp) > 1)
-            $this->dontShowIfOfFk = false;
-        if($differentTables)
-            $separatorTables = ',';
+        $separator = '';
+
+//        if(count($fieldsTmp) > 1)
+//            $this->dontShowIfOfFk = false;
+        if(count($fieldsTmp) > 0 && count($f) > 0)
+            $separator = ',';
 
         $toReturn = implode( ',', $fieldsTmp );
 
 
-        $separator = ',';
+        if($differentTables)
+            $separatorTables = ',';
 
-        if($this->dontShowIfOfFk || count($fields) >= 1)
-            $separator = '';
+//        if($this->dontShowIfOfFk || count($fields) >= 1)
+//            $separator = '';
 
         $sql = "SELECT {$toReturn}{$separator} ";
 
@@ -152,8 +179,9 @@ class DB {
             $sql .= ' WHERE ' . $this->prepare2AddFks2Where($fields);
 
 
-        $result = $this->executeQuery( $sql );
 
+        $result = $this->executeQuery( $sql );
+        
         return $result;
     }
 
@@ -163,10 +191,12 @@ class DB {
      * @throws DBException
      */
     public function find( $id ) {
-        if( !is_int( $id ) || $id == null )
-            throw new DBException( '$id has to be an Integer' );
+//        if( !is_int( $id ) || $id == null )
+//            throw new DBException( '$id has to be an Integer' );
         $sql = "SELECT * FROM $this->table WHERE `id` = $id";
 
+        echo '<pre>$sql' . print_r( $sql, true ) . '</pre>';
+        
         return $this->executeQuery( $sql );
     }
 
@@ -181,6 +211,9 @@ class DB {
             $fields = $this->fields;
 
         $temporal = [];
+
+        $tmpFunc = $this->tmpFunc($fields);
+        $tmpFunc = rtrim($tmpFunc,", ");
 
         foreach( $fields as $field ) {
             $temporal[] = $this->table . '.' . $field;
@@ -203,8 +236,10 @@ class DB {
         if( !empty( $fks ) )
             $sql = "SELECT $toReturn, {$tmp[1]}.{$tmp[3]} FROM $this->table, $tmp[1]  WHERE `$fieldNameWhere` = '$valueWhere' AND $tmp[1].id = $tt";
         else
-            $sql = "SELECT * FROM $this->table WHERE `$fieldNameWhere` = '$valueWhere'";
+            $sql = "SELECT * FROM $this->table WHERE {$this->table}.`$fieldNameWhere` = '$valueWhere'";
 
+        echo '<pre>$sql' . print_r( $sql, true ) . '</pre>';
+        
         return $this->executeQuery( $sql );
     }
 
@@ -294,6 +329,7 @@ class DB {
         }
         $keys = array_keys( $array );
         $sql = "INSERT INTO " . $this->table . ' ( ' . implode( ', ', $keys ) . ' ) VALUES ( ' . implode( ', ', $array ) . ' );';
+
 
         return $this->executeUpdate( $sql );
     }
@@ -419,7 +455,10 @@ class DB {
             if($this->dontShowIfOfFk){
                 $table = $this->table . '.';
             }
-            $wheres[] = "{$table}{$rawFks[$index]} = {$fk[1]}.{$fk[2]}";
+
+            $t = "{$table}{$rawFks[$index]} ";
+            $t = ltrim($t, 'rooms.');
+            $wheres[] = "$t = {$fk[1]}.{$fk[2]}";
         }
 
 

@@ -22,7 +22,7 @@ class APIRoomsTypes extends Controller implements ResourceInterface {
         $roomType = new RoomType();
 
         $roomTypes = $roomType->getAll();
-
+        
         header('Content-Type: application/json');
         echo json_encode($roomTypes);
         return json_encode($roomTypes);
@@ -49,7 +49,12 @@ class APIRoomsTypes extends Controller implements ResourceInterface {
      * @return mixed
      */
     public function show() {
-        // TODO: Implement show() method.
+        $roomType = new RoomType();
+        $roomTypes = $roomType->getById(1);
+
+        header('Content-Type: application/json');
+        echo json_encode($roomTypes);
+        return json_encode($roomTypes);
     }
 
     /**

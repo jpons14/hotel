@@ -17,6 +17,10 @@ class RoomType extends DB{
         return $this->select();
     }
 
+    public function getById( $id ) {
+        return $this->find($id);
+    }
+
     public function __set( $name, $value ) {
         // TODO: Implement __set() method.
     }

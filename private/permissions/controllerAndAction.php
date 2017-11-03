@@ -35,7 +35,8 @@ return [
     ],
     'Rooms' => [
         'index' => 200,
-        'create' => 200
+        'create' => 200,
+        'edit' => 200,
     ],
     'APIRoomsTypes' => [
         'index' => 100

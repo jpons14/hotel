@@ -11,11 +11,24 @@ class Room extends DB {
         return $this->select();
     }
 
+    public function getById( $id ) {
+
+        return $this->where('id', $id);
+    }
+
     public function getOnParamether( $paramether ) {
         if(!is_string($paramether) || $paramether === '')
             throw new NoCompatibleVarTypeException('$paramether must be a string');
 
         return $this->select([$paramether]);
     }
+
+    /**
+     * @param array $values
+     */
+    public function addRoom( array $values ) {
+        $this->insert($values);
+    }
+
 
 }

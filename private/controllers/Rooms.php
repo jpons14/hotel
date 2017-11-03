@@ -16,17 +16,17 @@ class Rooms extends Controller implements ResourceInterface {
         $room = new Room();
         $all = $room->getAll();
 
-        new View( ['roomCreateButton'], [], [ 'TableWidget' => [
-            'fields' => [ 'id', 'Room type name', 'Adults max num', 'Children max num', 'Name', 'Edit', 'Delete' ],
+        new View( [ 'roomCreateButton' ], [], [ 'TableWidget' => [
+            'fields' => [ 'id', 'Adults max num', 'Children max num', 'Room type name', 'Name', 'Edit', 'Delete' ],
             'values' => $all,
             'editable' => true,
             'editURI' => '/rooms/edit?id=',
-            'editNum' => 2,
+            'editNum' => 0,
             'deletable' => true,
             'deleteURI' => '/rooms/destroy?id='
         ] ] );
 
-        new View( ['roomCreateButton']);
+        new View( [ 'roomCreateButton' ] );
 
     }
 
@@ -41,16 +41,16 @@ class Rooms extends Controller implements ResourceInterface {
         ] ] );
 
         $room = new Room();
-        $all = $room->getOnParamether('fk_roomtypes_id_name');
+        $all = $room->getOnParamether( 'fk_roomtypes_id_name' );
 
         $roomTypes = new RoomType();
 
         $types = $roomTypes->name;
 
 
-        new View(['roomTypesJS'],[],['CreateRoomWidget' => [
+        new View( [ 'roomTypesJS' ], [], [ 'CreateRoomWidget' => [
             'roomTypes' => $types
-        ]]);
+        ] ] );
 
     }
 
@@ -58,20 +58,37 @@ class Rooms extends Controller implements ResourceInterface {
      * Will story the information that comes from the crate function (form)
      */
     public function store() {
-
+        echo '<pre>$_POST' . print_r( $_POST, true ) . '</pre>';
+        $room = new Room();
+        $room->addRoom( $_POST );
+        header( "Location: " . FORM_ACTION . "/rooms/index" );
     }
 
     /**
      * Will show the details of the resource
      */
     public function show() {
-
+        $user = new User( $this->session->getVar( 'userEmail' ) );
+        new View( [ 'header' ] );
+        new View( [], [], [ 'MenuWidget' => [
+            'userType' => $this->session->getVar( 'userType' )
+        ] ] );
     }
 
     /**
      * Will show the edit form of the resource
      */
     public function edit() {
+        $user = new User( $this->session->getVar( 'userEmail' ) );
+        new View( [ 'header' ] );
+        new View( [], [], [ 'MenuWidget' => [
+            'userType' => $this->session->getVar( 'userType' )
+        ] ] );
+        echo '<pre>$_REQUEST' . print_r( $_REQUEST, true ) . '</pre>';
+
+        $room = new Room();
+        $roomData = $room->getById($_GET['id']);
+        echo '<pre>$roomData' . print_r( $roomData, true ) . '</pre>';
 
     }
 

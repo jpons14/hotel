@@ -20,7 +20,7 @@ class MenuWidget extends FatherWidget {
 <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
 </button>
-            <a class="navbar-brand" href="#">JosepLibrary</a>
+            <a class="navbar-brand" href="#">JosepHotel</a>
     <div class="container-fluid">
 
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
