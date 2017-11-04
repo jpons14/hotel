@@ -97,17 +97,18 @@ class DB {
         foreach( $fieldsTmp as $index => $item ) {
             if( strpos( $item, 'fk' ) !== false ) {
                 $differentTables = true;
-                unset($fieldsTmp[$index]);
+                unset( $fieldsTmp[ $index ] );
                 $f[] = $item;
             }
         }
-        if(count($f) > 0)
-        $this->dontShowIfOfFk = false;
+        if( count( $f ) > 0 )
+            $this->dontShowIfOfFk = false;
         $separator = '';
-        if(count($fieldsTmp) > 0 && count($f) > 0)
+        if( count( $fieldsTmp ) > 0 && count( $f ) > 0 )
             $separator = ',';
         $toReturn = implode( ',', $fieldsTmp );
         $sql = "SELECT {$toReturn}{$separator} ";
+
         return $sql;
     }
 
@@ -138,50 +139,49 @@ class DB {
         foreach( $fieldsTmp as $index => $item ) {
             if( strpos( $item, 'fk' ) !== false ) {
                 $differentTables = true;
-                unset($fieldsTmp[$index]);
+                unset( $fieldsTmp[ $index ] );
                 $f[] = $item;
             }
         }
 
-        if(count($f) > 0)
+        if( count( $f ) > 0 )
             $this->dontShowIfOfFk = false;
 
         $separatorTables = '';
 
         $separator = '';
 
-//        if(count($fieldsTmp) > 1)
-//            $this->dontShowIfOfFk = false;
-        if(count($fieldsTmp) > 0 && count($f) > 0)
+        //        if(count($fieldsTmp) > 1)
+        //            $this->dontShowIfOfFk = false;
+        if( count( $fieldsTmp ) > 0 && count( $f ) > 0 )
             $separator = ',';
 
         $toReturn = implode( ',', $fieldsTmp );
 
 
-        if($differentTables)
+        if( $differentTables )
             $separatorTables = ',';
 
-//        if($this->dontShowIfOfFk || count($fields) >= 1)
-//            $separator = '';
+        //        if($this->dontShowIfOfFk || count($fields) >= 1)
+        //            $separator = '';
 
         $sql = "SELECT {$toReturn}{$separator} ";
 
-        $sql .= $this->prepare2AddFks2Select($fields);
+        $sql .= $this->prepare2AddFks2Select( $fields );
 
         $sql .= " FROM {$this->table}{$separatorTables}";
 
-        $sql .= $this->prepare2AddFks2From($fields);
+        $sql .= $this->prepare2AddFks2From( $fields );
 
         $foo = false;
         $this->splitFks( $this->rawFields, $foo );
 
-        if($foo)
-            $sql .= ' WHERE ' . $this->prepare2AddFks2Where($fields);
-
+        if( $foo )
+            $sql .= ' WHERE ' . $this->prepare2AddFks2Where( $fields );
 
 
         $result = $this->executeQuery( $sql );
-        
+
         return $result;
     }
 
@@ -191,12 +191,12 @@ class DB {
      * @throws DBException
      */
     public function find( $id ) {
-//        if( !is_int( $id ) || $id == null )
-//            throw new DBException( '$id has to be an Integer' );
+        //        if( !is_int( $id ) || $id == null )
+        //            throw new DBException( '$id has to be an Integer' );
         $sql = "SELECT * FROM $this->table WHERE `id` = $id";
 
         echo '<pre>$sql' . print_r( $sql, true ) . '</pre>';
-        
+
         return $this->executeQuery( $sql );
     }
 
@@ -212,34 +212,66 @@ class DB {
 
         $temporal = [];
 
-        $tmpFunc = $this->tmpFunc($fields);
-        $tmpFunc = rtrim($tmpFunc,", ");
 
-        foreach( $fields as $field ) {
-            $temporal[] = $this->table . '.' . $field;
-        }
+        $tmpFunc = $this->tmpFunc( $fields );
+        $tmpFunc = rtrim( $tmpFunc, ", " );
 
-        $fields = $temporal;
+        //        foreach( $fields as $field ) {
+        //            $temporal[] = $this->table . '.' . $field;
+        //        }
+
+        //        $fields = $temporal;
 
         $toReturn = implode( ',', $fields );
         $fks = [];
         $tt = '';
-        foreach( $fields as $field ) {
+        foreach( $fields as $key => $field ) {
             if( strpos( $field, 'fk' ) !== false ) {
-                $fks[] = $field;
+                $fks[] = ltrim( $field, $this->table . '.' );
+                unset( $fields[ $key ] );
                 $tt = $field;
             }
         }
 
-        $tmp = explode( '_', $fks[ 0 ] );
+        $temporalSelect = [];
+        $temporalFrom = [];
+        $temporalWhere = [];
+
+        foreach( $fks as $fk ) {
+            $in = explode( '_', $fk );
+            $temporalSelect[] = $in[ 1 ] . '.' . $in[ 3 ];
+            $temporalFrom[] = $in[1];
+            $temporalWhere[] = $this->table . '.' . $fk . ' = ' . $in[1] . '.' . $in[2];
+        }
+
+        $fksSelect = implode( ',', $temporalSelect );
+        $fksFrom = implode(',', $temporalFrom);
+        $fksWhere = implode(' AND ', $temporalWhere);
+
+        //        $tmp = explode( '_', $fks[ 0 ] );
+
+
+        /**
+         * Detect if any fk
+         * if is there, split in 2 different arrays
+         */
+
+        $select = $toReturn . ',' . $fksSelect;
+        $select = rtrim( $select, ',' );
+
+        $from = $this->table . ',' . $fksFrom;
+        $from = rtrim($from, ',');
+
+        $where = "`$fieldNameWhere` = '$valueWhere' AND $fksWhere";
+        $where = rtrim($where, ' AND ');
 
         if( !empty( $fks ) )
-            $sql = "SELECT $toReturn, {$tmp[1]}.{$tmp[3]} FROM $this->table, $tmp[1]  WHERE `$fieldNameWhere` = '$valueWhere' AND $tmp[1].id = $tt";
+            $sql = "SELECT $select FROM $from WHERE $where";
         else
             $sql = "SELECT * FROM $this->table WHERE {$this->table}.`$fieldNameWhere` = '$valueWhere'";
 
         echo '<pre>$sql' . print_r( $sql, true ) . '</pre>';
-        
+
         return $this->executeQuery( $sql );
     }
 
@@ -452,15 +484,14 @@ class DB {
 
         $wheres = [];
         foreach( $fks as $index => $fk ) {
-            if($this->dontShowIfOfFk){
+            if( $this->dontShowIfOfFk ) {
                 $table = $this->table . '.';
             }
 
             $t = "{$table}{$rawFks[$index]} ";
-            $t = ltrim($t, 'rooms.');
+            $t = ltrim( $t, 'rooms.' );
             $wheres[] = "$t = {$fk[1]}.{$fk[2]}";
         }
-
 
 
         return implode( ' AND ', $wheres );

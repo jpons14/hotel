@@ -12,8 +12,7 @@ class Room extends DB {
     }
 
     public function getById( $id ) {
-
-        return $this->where('id', $id);
+        return $this->where('id', $id, $this->fields);
     }
 
     public function getOnParamether( $paramether ) {
