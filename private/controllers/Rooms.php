@@ -58,7 +58,6 @@ class Rooms extends Controller implements ResourceInterface {
      * Will story the information that comes from the crate function (form)
      */
     public function store() {
-        echo '<pre>$_POST' . print_r( $_POST, true ) . '</pre>';
         $room = new Room();
         $room->addRoom( $_POST );
         header( "Location: " . FORM_ACTION . "/rooms/index" );
@@ -84,11 +83,11 @@ class Rooms extends Controller implements ResourceInterface {
         new View( [], [], [ 'MenuWidget' => [
             'userType' => $this->session->getVar( 'userType' )
         ] ] );
-        echo '<pre>$_REQUEST' . print_r( $_REQUEST, true ) . '</pre>';
 
         $room = new Room();
         $roomData = $room->getById($_GET['id']);
-        echo '<pre>$roomData' . print_r( $roomData, true ) . '</pre>';
+
+        new View(['roomEdit'], ['id' => $_GET['id']]);
 
     }
 

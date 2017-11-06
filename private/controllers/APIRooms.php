@@ -51,7 +51,11 @@ class APIRooms extends Controller implements ResourceInterface {
      * @return mixed
      */
     public function edit() {
-        // TODO: Implement edit() method.
+        $room = new Room();
+        $roomData = $room->getById($_GET['id']);
+        header('Content-Type: application/json');
+        echo json_encode($roomData);
+        return json_encode($roomData);
     }
 
     /**

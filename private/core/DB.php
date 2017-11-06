@@ -195,7 +195,6 @@ class DB {
         //            throw new DBException( '$id has to be an Integer' );
         $sql = "SELECT * FROM $this->table WHERE `id` = $id";
 
-        echo '<pre>$sql' . print_r( $sql, true ) . '</pre>';
 
         return $this->executeQuery( $sql );
     }
@@ -216,11 +215,6 @@ class DB {
         $tmpFunc = $this->tmpFunc( $fields );
         $tmpFunc = rtrim( $tmpFunc, ", " );
 
-        //        foreach( $fields as $field ) {
-        //            $temporal[] = $this->table . '.' . $field;
-        //        }
-
-        //        $fields = $temporal;
 
         $toReturn = implode( ',', $fields );
         $fks = [];
@@ -236,6 +230,7 @@ class DB {
         $temporalSelect = [];
         $temporalFrom = [];
         $temporalWhere = [];
+
 
         foreach( $fks as $fk ) {
             $in = explode( '_', $fk );
@@ -262,15 +257,20 @@ class DB {
         $from = $this->table . ',' . $fksFrom;
         $from = rtrim($from, ',');
 
-        $where = "`$fieldNameWhere` = '$valueWhere' AND $fksWhere";
+        $where = "{$this->table}. `$fieldNameWhere` = '$valueWhere' AND $fksWhere";
         $where = rtrim($where, ' AND ');
 
+        $this->buildWhere("$this->table WHERE {$this->table}.`$fieldNameWhere` = '$valueWhere'");
+
+        
+        $tmpSql = "SELECT " . $this->buildSelect() . " FROM " . $this->buildFrom() . " WHERE " .  $this->buildWhere("{$this->table}.`$fieldNameWhere` = '$valueWhere'");
+        echo '<pre>$tmpSql ' . print_r( $tmpSql , true ) . '</pre>';
+        
+        
         if( !empty( $fks ) )
             $sql = "SELECT $select FROM $from WHERE $where";
         else
             $sql = "SELECT * FROM $this->table WHERE {$this->table}.`$fieldNameWhere` = '$valueWhere'";
-
-        echo '<pre>$sql' . print_r( $sql, true ) . '</pre>';
 
         return $this->executeQuery( $sql );
     }
@@ -328,7 +328,6 @@ class DB {
         else
             $sql = "SELECT $fields FROM $this->table WHERE `$fieldName` = '$value' ORDER BY $orderBy $order";
 
-        echo '<pre>$sql' . print_r( $sql, true ) . '</pre>';
 
         return $this->executeQuery( $sql );
     }
@@ -435,6 +434,102 @@ class DB {
         return $fks;
 
     }
+
+
+    private function buildSelect( $fields = [] ) {
+        if( !is_array( $fields ) )
+            throw new NoCompatibleVarTypeException( '$rawFields is not an array' );
+        if( $fields === [] )
+            $fields = $this->rawFields;
+
+        $fks = [];
+
+        foreach( $fields as $key => $field ) {
+            if( strpos( $field, 'fk' ) !== false ) {
+                $fks[] = ltrim( $field, $this->table . '.' );
+                unset( $fields[ $key ] );
+            }
+        }
+
+        foreach( $fields as $index => $field ) {
+            $fields[$index] = $this->table . '.' . $field;
+        }
+
+        $toReturn = implode(',', $fields);
+
+        $temporalSelect = [];
+
+        foreach( $fks as $fk ) {
+            $in = explode( '_', $fk );
+            $temporalSelect[] = $in[ 1 ] . '.' . $in[ 3 ];
+        }
+        $fksSelect = implode( ',', $temporalSelect );
+
+
+        $select = $toReturn . ',' . $fksSelect;
+        $select = rtrim( $select, ',' );
+
+        return $select;
+    }
+
+    private function buildFrom( $fields = [] ) {
+        if( !is_array( $fields ) )
+            throw new NoCompatibleVarTypeException( '$rawFields is not an array' );
+        if( $fields === [] )
+            $fields = $this->rawFields;
+
+        $fks = [];
+
+        foreach( $fields as $key => $field ) {
+            if( strpos( $field, 'fk' ) !== false ) {
+                $fks[] = ltrim( $field, $this->table . '.' );
+                unset( $fields[ $key ] );
+            }
+        }
+
+        $temporalFrom = [];
+
+        foreach( $fks as $fk ) {
+            $in = explode( '_', $fk );
+            $temporalFrom[] = $in[1];
+        }
+        $fksFrom = implode(',', $temporalFrom);
+
+        $from = $this->table . ',' . $fksFrom;
+        $from = rtrim($from, ',');
+
+        return $from;
+    }
+    private function buildWhere( $initialWhere, $fields = [] ) {
+        if( !is_array( $fields ) )
+            throw new NoCompatibleVarTypeException( '$rawFields is not an array' );
+        if( $fields === [] )
+            $fields = $this->rawFields;
+
+        $fks = [];
+
+        foreach( $fields as $key => $field ) {
+            if( strpos( $field, 'fk' ) !== false ) {
+                $fks[] = ltrim( $field, $this->table . '.' );
+                unset( $fields[ $key ] );
+            }
+        }
+
+        $temporalWhere = [];
+
+        foreach( $fks as $fk ) {
+            $in = explode( '_', $fk );
+            $temporalWhere[] = $this->table . '.' . $fk . ' = ' . $in[1] . '.' . $in[2];
+        }
+
+        $fksWhere = implode(' AND ', $temporalWhere);
+
+        $where = "$initialWhere AND $fksWhere";
+        $where = rtrim($where, ' AND ');
+        
+        return $where;
+    }
+
 
     private function prepare2AddFks2Select( $rawFields = [] ) {
         if( !is_array( $rawFields ) )
