@@ -6,15 +6,15 @@ class Bookings extends Controller {
         parent::__construct( $private );
     }
 
+
+    public function showForms( ) {
+        new View(['header', 'bookingForm']);
+    }
+    
     public function index() {
         $booking = new Booking();
         $booking->getAllBookings();
         $elements = $booking->getAllBookings( [ 'id', 'fk_users_dni_dni', 'start_date', 'end_date' ] );
-//        $returneds = $booking->getAllBookings( [ 'returned' ] );
-
-
-//        $book = new Book();
-//        $books = $book->getAll();
 
         foreach( $elements as $index => $element ) {
             if( $returneds[ $index ][ 0 ] == 1 ) {

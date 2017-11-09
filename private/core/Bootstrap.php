@@ -18,12 +18,12 @@ class Bootstrap {
         if( isset( $_GET[ 'controller' ] ) ) {
             $_GET[ 'controller' ] = ucwords( $uri[ $count - 2 ] );
         } else {
-            $_GET[ 'controller' ] = 'Users';
+            $_GET[ 'controller' ] = 'Bookings';
         }
         if( isset( $_GET[ 'action' ] ) ) {
             $_GET[ 'action' ] = $uri[ $count - 1 ];
         } else {
-            $_GET[ 'action' ] = 'Login';
+            $_GET[ 'action' ] = 'showForms';
         }
 
 

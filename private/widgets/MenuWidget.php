@@ -24,9 +24,9 @@ class MenuWidget extends FatherWidget {
     <div class="container-fluid">
 
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <ul class="nav navbar-nav ml-auto">
-                <li class="nav-item"><a class="nav-link" href="$GLOBALS[formAction]/books/all">List of Books</a></li>    
-            </ul>
+            <!--<ul class="nav navbar-nav ml-auto">-->
+                <!--<li class="nav-item"><a class="nav-link" href="$GLOBALS[formAction]/books/all">List of Books</a></li>    -->
+            <!--</ul>-->
             <ul class="navbar-nav mr-auto">
 
             

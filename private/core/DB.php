@@ -264,13 +264,13 @@ class DB {
 
         
         $tmpSql = "SELECT " . $this->buildSelect() . " FROM " . $this->buildFrom() . " WHERE " .  $this->buildWhere("{$this->table}.`$fieldNameWhere` = '$valueWhere'");
-        echo '<pre>$tmpSql ' . print_r( $tmpSql , true ) . '</pre>';
-        
+        $q = $this->executeQuery($tmpSql);
+
         
         if( !empty( $fks ) )
             $sql = "SELECT $select FROM $from WHERE $where";
         else
-            $sql = "SELECT * FROM $this->table WHERE {$this->table}.`$fieldNameWhere` = '$valueWhere'";
+            $sql = $tmpSql;
 
         return $this->executeQuery( $sql );
     }
@@ -394,7 +394,8 @@ class DB {
             $array[ '`' . $index . '`' ] = '`' . $index . '` = \'' . $value . '\'';
         }
 
-        $sql = "UPDATE $this->table SET " . implode( ' & ', $array ) . ' WHERE `' . $idName . '` = \'' . $id . '\';';
+        $sql = "UPDATE $this->table SET " . implode( ' , ', $array ) . ' WHERE `' . $idName . '` = \'' . $id . '\';';
+
 
         return $this->executeUpdate( $sql );
     }

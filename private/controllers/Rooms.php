@@ -85,9 +85,18 @@ class Rooms extends Controller implements ResourceInterface {
         ] ] );
 
         $room = new Room();
-        $roomData = $room->getById($_GET['id']);
+        // The IDs of the values is the same order than in the DB
+        $roomData = $room->getById( $_GET[ 'id' ] );
 
-        new View(['roomEdit'], ['id' => $_GET['id']]);
+        echo '<pre>$roomData' . print_r( $roomData, true ) . '</pre>';
+
+        new View( [ 'roomEdit' ], [
+            'id' => $roomData[ 0 ][ 0 ],
+            'roomTypeSelected' => $roomData[ 0 ][ 1 ],
+            'name' => $roomData[ 0 ][ 4 ],
+            'adults_max_number' => $roomData[ 0 ][ 2 ],
+            'children_max_number' => $roomData[ 0 ][ 3 ]
+        ] );
 
     }
 
@@ -95,7 +104,15 @@ class Rooms extends Controller implements ResourceInterface {
      * Will update the resource that comes from edit form
      */
     public function update() {
+        $user = new User( $this->session->getVar( 'userEmail' ) );
+        new View( [ 'header' ] );
+        new View( [], [], [ 'MenuWidget' => [
+            'userType' => $this->session->getVar( 'userType' )
+        ] ] );
+        $room = new Room();
+        $room->update( $_POST, $_GET[ 'id' ] );
 
+        header( "Location: " . FORM_ACTION . "/rooms/index" );
     }
 
 
