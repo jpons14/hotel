@@ -19,6 +19,8 @@ return [
         'by' => 1
     ],
     'Bookings' => [
+        'showForms' => 1,
+        'checkAvailableRooms' => 1,
         'index' => 200,
         'booking' => 100,
         'by' => 100,

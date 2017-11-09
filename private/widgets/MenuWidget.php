@@ -61,7 +61,7 @@ CODE;
     }
 
     private function addForLibrarians() {
-        if( $GLOBALS[ 'usersPermission' ][ $this->vars[ 'userType' ] ] >= $GLOBALS[ 'usersPermission' ][ 'librarian' ] ) {
+        if( $GLOBALS[ 'usersPermission' ][ $this->vars[ 'userType' ] ] >= $GLOBALS[ 'usersPermission' ][ 'hotelier' ] ) {
             $this->return .= <<<CODE
                         <li class="nav-item"><a class="nav-link" href="$GLOBALS[formAction]/books/index">Search</a></li>
                         <li class="nav-item"><a class="nav-link" href="$GLOBALS[formAction]/bookings/toOtherUser">Book To Other User</a></li>

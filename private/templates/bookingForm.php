@@ -1,5 +1,6 @@
+<br />
 <div class="container">
-    <form method="POST" action="[[ formAction ]]/bookings/booking?bookId=[[ id ]]">
+    <form method="POST" action="[[ formAction ]]/bookings/checkAvailableRooms">
         <div class="form-group">
             <label for="pickUp">Pick Up Date</label>
             <input name="pickUp" required class="form-control datepicker" type="text" id="pickUp"/>

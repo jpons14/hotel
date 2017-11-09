@@ -8,9 +8,22 @@ class Bookings extends Controller {
 
 
     public function showForms( ) {
+        $user = new User( $this->session->getVar( 'userEmail' ) );
+        new View( [ 'header' ] );
+        new View( [], [], [ 'MenuWidget' => [
+            'userType' => $this->session->getVar( 'userType' )
+        ] ] );
         new View(['header', 'bookingForm']);
     }
-    
+
+    public function checkAvailableRooms(  ) {
+        $this->menu();
+        echo '<pre>$_POST' . print_r( $_POST, true ) . '</pre>';
+        $room = new Room();
+        $rooms = $room->getall();
+
+    }
+
     public function index() {
         $booking = new Booking();
         $booking->getAllBookings();
