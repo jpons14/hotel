@@ -26,8 +26,8 @@ class Bookings extends Controller {
         );
 
         $booking = new Booking();
-        $bookings = $booking->getAllBookings();
-        echo '<pre>$bookings' . print_r( $bookings, true ) . '</pre>';die;
+        $bookings = $booking->getBookingById(1)->start_date;
+        echo '<pre>$bookings ' . print_r( $bookings, true ) . '</pre>';die;
 
         $roomTypes = new RoomType();
         /**

@@ -168,17 +168,17 @@ class Booking extends DB {
      * @param $data
      */
     private function setData( $data ) {
-        $this->id = $data[0];
-        $this->start_date = $data[1];
-        $this->end_date = $data[2];
-        $this->confirmed = $data[3];
-        $this->pay_method = $data[4];
-        $this->paid = $data[5];
-        $this->adults_number = $data[6];
-        $this->children_number = $data[7];
-        $this->room_type = $data[8];
-        $this->fk_users_dni = $data[9];
-        $this->room_name = $data[10];
+        $this->id = $data[0][0];
+        $this->start_date = $data[0][1];
+        $this->end_date = $data[0][2];
+        $this->confirmed = $data[0][3];
+        $this->pay_method = $data[0][4];
+        $this->paid = $data[0][5];
+        $this->adults_number = $data[0][6];
+        $this->children_number = $data[0][7];
+        $this->room_type = $data[0][8];
+        $this->fk_users_dni = $data[0][9];
+        $this->room_name = $data[0][10];
     }
 
 }
