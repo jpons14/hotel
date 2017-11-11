@@ -24,6 +24,11 @@ class Bookings extends Controller {
                 'endDate' => $_POST['end_date']
             ]
         );
+
+        $booking = new Booking();
+        $bookings = $booking->getAllBookings();
+        echo '<pre>$bookings' . print_r( $bookings, true ) . '</pre>';die;
+
         $roomTypes = new RoomType();
         /**
          * Check if in the room type is there any room with a booking between the specified dates

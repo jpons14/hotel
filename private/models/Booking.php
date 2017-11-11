@@ -4,6 +4,34 @@ class Booking extends DB {
 
     private $conservation;
 
+    private $id;
+    private $start_date;
+    private $end_date;
+    private $confirmed;
+    private $pay_method;
+    private $paid;
+    private $adults_number;
+    private $children_number;
+    private $room_type;
+    private $fk_users_dni;
+    private $room_name;
+
+
+    /**
+     * 0 => id
+     * 1 => start_date
+     * 2 => end_date
+     * 3 => confirmed
+     * 4 => pay_method
+     * 5 => paid
+     * 6 => adults_number
+     * 7 => children_number
+     * 8 => room_type
+     * 9 => fk_users_dni
+     * 10 => room_name
+     * Booking constructor.
+     * @param string $charset
+     */
     public function __construct( $charset = 'UTF8' ) {
         parent::__construct( $charset );
         $this->setTable( 'bookings' );
@@ -20,6 +48,24 @@ class Booking extends DB {
             'new' => 20
         ];
 
+    }
+
+    public function __get( $name ) {
+        return $this->$name;
+    }
+
+
+    /**
+     * @param $id
+     * @return Booking $this
+     */
+    public function getBookingById( $id ) {
+        if(is_int($id))
+            $id = $id . '';
+
+        $data = $this->where('id', $id);
+        $this->setData($data);
+        return $this;
     }
 
     public function getAllBookings( $elements = [] ) {
@@ -104,6 +150,35 @@ class Booking extends DB {
 
     public function return( $id ) {
         return $this->update( [ 'returned' => 1 ], $id );
+    }
+
+    /**
+     *
+     * 0 => id
+     * 1 => start_date
+     * 2 => end_date
+     * 3 => confirmed
+     * 4 => pay_method
+     * 5 => paid
+     * 6 => adults_number
+     * 7 => children_number
+     * 8 => room_type
+     * 9 => fk_users_dni
+     * 10 => room_name
+     * @param $data
+     */
+    private function setData( $data ) {
+        $this->id = $data[0];
+        $this->start_date = $data[1];
+        $this->end_date = $data[2];
+        $this->confirmed = $data[3];
+        $this->pay_method = $data[4];
+        $this->paid = $data[5];
+        $this->adults_number = $data[6];
+        $this->children_number = $data[7];
+        $this->room_type = $data[8];
+        $this->fk_users_dni = $data[9];
+        $this->room_name = $data[10];
     }
 
 }
