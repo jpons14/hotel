@@ -1,0 +1,26 @@
+<?php
+
+
+class roomsTypesListWidget extends FatherWidget {
+    public function __construct( $vars ) {
+        parent::__construct( $vars );
+    }
+
+
+    public function __toString() {
+        $html = '<div class="container">';
+        foreach( $this->vars[ 'data' ] as $datum ) {
+            $html .= <<<PHP
+<div class="card">
+  <div class="card-block">
+    $datum[1] with a price of $datum[2]€ <div class="float-right"><a href="#" class="btn btn-primary">reserve</a></div>
+  </div>
+</div>
+<hr />
+PHP;
+        }
+        $html .= '</div>';
+
+        return $html;
+    }
+}

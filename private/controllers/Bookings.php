@@ -7,20 +7,51 @@ class Bookings extends Controller {
     }
 
 
-    public function showForms( ) {
-        $user = new User( $this->session->getVar( 'userEmail' ) );
-        new View( [ 'header' ] );
-        new View( [], [], [ 'MenuWidget' => [
-            'userType' => $this->session->getVar( 'userType' )
-        ] ] );
-        new View(['header', 'bookingForm']);
+    public function showForms() {
+        $this->menu();
+        new View( [ 'header', 'bookingForm' ] );
     }
 
-    public function checkAvailableRooms(  ) {
+    /**
+     * Get All bookings
+     * Get
+     */
+    public function checkAvailableRooms() {
         $this->menu();
-        echo '<pre>$_POST' . print_r( $_POST, true ) . '</pre>';
-        $room = new Room();
-        $rooms = $room->getall();
+        new View( [ 'showDates' ], [
+                'startDate' => $_POST[ 'start_date' ],
+                'endDate' => $_POST['end_date']
+            ]
+        );
+        $roomTypes = new RoomType();
+        /**
+         * Check if in the room type is there any room with a booking between the specified dates
+         */
+
+        $allRoomTypes = $roomTypes->getAll();
+
+
+
+        foreach( $allRoomTypes as $key => $item ) {
+            $rooms = new Room();
+            $roomsList = $rooms->where('fk_roomtypes_id_name', $item[0]);
+
+            echo '<pre>$roomsList' . print_r( $roomsList, true ) . '</pre>';
+            
+            // If the room types don't have any room available take it out of the array
+            $counter = 0;
+            foreach( $roomsList as $room ) {
+                if( $item[ 1 ] == $room[ 6 ] ) {
+                    $counter++;
+                }
+            }
+            if( $counter == 0 )
+                unset( $allRoomTypes[ $key ] );
+        }
+
+        new View( [], [], [ 'roomsTypesListWidget' => [
+            'data' => $allRoomTypes
+        ] ] );
 
     }
 
@@ -63,7 +94,7 @@ class Bookings extends Controller {
         ] ] );
     }
 
-    public function return () {
+    public function return() {
         $booking = new Booking();
         if( isset( $_GET[ 'id' ] ) ) {
             $booking->return( $_GET[ 'id' ] );
@@ -120,14 +151,14 @@ class Bookings extends Controller {
                 $tp = $this->byBookId( $_POST[ 'text' ] );
                 break;
             case 'notReturned':
-                $tp = $this->byNotReturned('past');
+                $tp = $this->byNotReturned( 'past' );
                 break;
             case 'todayReturn':
-                $tp = $this->byNotReturned('today');
+                $tp = $this->byNotReturned( 'today' );
                 break;
             default:
-                if(!isset($_POST['text'])){
-                    $_POST['text'] = $_GET['text'];
+                if( !isset( $_POST[ 'text' ] ) ) {
+                    $_POST[ 'text' ] = $_GET[ 'text' ];
                 }
                 $tp = $this->byBookId( $_POST[ 'text' ] );
                 break;
@@ -138,7 +169,7 @@ class Bookings extends Controller {
             'values' => $tp,
             'editable' => true,
             'editURI' => '/bookings/return?id=',
-                'editNum' => 0
+            'editNum' => 0
         ] ] );
 
     }
@@ -152,8 +183,8 @@ class Bookings extends Controller {
 
     public function byBookId( $text = '' ) {
         if( $text == '' ) {
-            if(!isset($_POST['text'])){
-                $_POST['text'] = $_GET['text'];
+            if( !isset( $_POST[ 'text' ] ) ) {
+                $_POST[ 'text' ] = $_GET[ 'text' ];
             }
             $text = $_POST[ 'text' ];
 
@@ -170,7 +201,7 @@ class Bookings extends Controller {
     }
 
     // need to search by e-mail too
-    public function byNotReturned($pastOrToday = 'past') {
+    public function byNotReturned( $pastOrToday = 'past' ) {
         $b = new Booking();
         $bookings = $b->getAllBookings();
 
@@ -178,16 +209,17 @@ class Bookings extends Controller {
 
 
         foreach( $bookings as $index => $booking ) {
-            if ($pastOrToday == 'past') {
+            if( $pastOrToday == 'past' ) {
                 if( strtotime( date( 'm/d/Y' ) ) > strtotime( $booking[ 4 ] ) ) {
                     $return[] = $booking;
                 }
-            } elseif($pastOrToday == 'today'){
+            } elseif( $pastOrToday == 'today' ) {
                 if( strtotime( date( 'm/d/Y' ) ) == strtotime( $booking[ 4 ] ) ) {
                     $return[] = $booking;
                 }
             }
         }
+
         return $return;
     }
 
@@ -216,17 +248,17 @@ class Bookings extends Controller {
         ] ] );
     }
 
-    public function toOtherUser(  ) {
+    public function toOtherUser() {
         new View( [ 'header' ] );
         new View( [], [], [ 'MenuWidget' => [
             'userType' => $this->session->getVar( 'userType' )
         ] ] );
 
-        new View(['toOtherUserBooking']);
+        new View( [ 'toOtherUserBooking' ] );
 
     }
 
-    public function bookToOther(  ) {
+    public function bookToOther() {
         echo '<pre>$_POST' . print_r( $_POST, true ) . '</pre>';
 
 
@@ -253,12 +285,12 @@ class Bookings extends Controller {
         $elements = [
             'pick_up' => $_POST[ 'pickUp' ],
             'pick_off' => $pickOff,
-            'user_email' => $_POST['userEmail'],
+            'user_email' => $_POST[ 'userEmail' ],
             'book_id' => $_POST[ 'bookId' ]
         ];
         $booking = new Booking();
         $booking->newBooking( $elements );
-        header('Location: ' . FORM_ACTION . '/bookings/toOtherUser');
+        header( 'Location: ' . FORM_ACTION . '/bookings/toOtherUser' );
     }
 
 }

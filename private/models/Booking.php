@@ -9,11 +9,11 @@ class Booking extends DB {
         $this->setTable( 'bookings' );
 
         try {
-            $this->setFields( [ 'id', 'start_date', 'end_date', 'confirmed', 'pay_method', 'paid', 'adults_number', 'children_number', 'fk_users_dni_dni', 'fk_rooms_id_name' ] );
+            $this->setFields( [ 'id', 'start_date', 'end_date', 'confirmed', 'pay_method', 'paid', 'adults_number', 'children_number', 'fk_users_dni_dni', 'fk_rooms_id_name', 'room_type'] );
         } catch(VarNoInitializedException $e){
             $e->showException();
         }
-        
+
         $this->conservation = [
             'old' => 5,
             'normal' => 10,
@@ -23,7 +23,8 @@ class Booking extends DB {
     }
 
     public function getAllBookings( $elements = [] ) {
-        echo '<pre>$elements' . print_r( $elements, true ) . '</pre>';
+        if(empty($elements) || $elements == [])
+            $elements = $this->fields;
         return $this->select( $elements );
     }
 
@@ -70,7 +71,7 @@ class Booking extends DB {
 
     }
 
-    private function isBetweenDates( $date1, $between1, $between2 ) {
+    public function isBetweenDates( $date1, $between1, $between2 ) {
         $date1 = strtotime( $date1 );
         $between1 = strtotime( $between1 );
         $between2 = strtotime( $between2 );

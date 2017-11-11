@@ -2,12 +2,12 @@
 <div class="container">
     <form method="POST" action="[[ formAction ]]/bookings/checkAvailableRooms">
         <div class="form-group">
-            <label for="pickUp">Pick Up Date</label>
-            <input name="pickUp" required class="form-control datepicker" type="text" id="pickUp"/>
+            <label for="start_date">Start Date</label>
+            <input name="start_date" required class="form-control datepicker" type="text" id="start_date"/>
         </div>
         <div class="form-group">
-            <label for="pickOff">Pick Off Date</label>
-            <input name="pickOff" required class="form-control datepicker" type="text" id="pickOff"/>
+            <label for="end_date">End date</label>
+            <input name="end_date" required class="form-control datepicker" type="text" id="end_date"/>
         </div>
         <div class="form-group">
             <input type="submit" class="btn btn-default" value="Reserve"/>
