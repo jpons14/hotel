@@ -13,6 +13,7 @@ class Bookings extends Controller {
     }
 
     /**
+     * To know which is the index you should check the constructor of each class
      * Get All bookings
      * Get
      */
@@ -42,6 +43,7 @@ class Bookings extends Controller {
             $counter = 0;
             foreach( $roomsList as $room ) {
                 if( $item[ 1 ] == $room[ 6 ] ) {
+                    if($room[6])
                     $counter++;
                 }
             }
@@ -52,6 +54,10 @@ class Bookings extends Controller {
         new View( [], [], [ 'roomsTypesListWidget' => [
             'data' => $allRoomTypes
         ] ] );
+
+    }
+
+    private function checkAvialibity( $roomId ) {
 
     }
 
