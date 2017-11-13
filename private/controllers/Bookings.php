@@ -26,9 +26,7 @@ class Bookings extends Controller {
         );
 
         $booking = new Booking();
-        $bookings = $booking->getBookingById(1)->start_date;
-        echo '<pre>$bookings ' . print_r( $bookings, true ) . '</pre>';die;
-
+//        $bookings = $booking->getBookingById(1)->start_date;
         $roomTypes = new RoomType();
         /**
          * Check if in the room type is there any room with a booking between the specified dates
@@ -36,13 +34,31 @@ class Bookings extends Controller {
 
         $allRoomTypes = $roomTypes->getAll();
 
+        $resultAllRoomTypes = [];
 
 
         foreach( $allRoomTypes as $key => $item ) {
             $rooms = new Room();
             $roomsList = $rooms->where('fk_roomtypes_id_name', $item[0]);
 
-            echo '<pre>$roomsList' . print_r( $roomsList, true ) . '</pre>';
+            foreach( $roomsList as $roomArray ) {
+                $tmpRoom = new Room();
+                $tmpRoom->setData($roomArray);
+                if($tmpRoom->booked == '1'){
+                    // Check availability of this room
+                    $bookingsByRoomId = $booking->getBookingsByRoomId($tmpRoom->id);
+                    foreach( $bookingsByRoomId as $value ) {
+                        $boolean = $booking->isBetweenDates( $value->start_date, $_POST['start_date'], $_POST['end_date']);
+                        $boolean2 = $booking->isBetweenDates( $value->end_date, $_POST['start_date'], $_POST['end_date']);
+                        if(!$boolean && !$boolean2) {
+                            $resultAllRoomTypes[] = $item;
+                        }
+
+                    }
+                } else {
+                    $resultAllRoomTypes[] = $item;
+                }
+            }
             
             // If the room types don't have any room available take it out of the array
             $counter = 0;
@@ -57,7 +73,7 @@ class Bookings extends Controller {
         }
 
         new View( [], [], [ 'roomsTypesListWidget' => [
-            'data' => $allRoomTypes
+            'data' => $resultAllRoomTypes
         ] ] );
 
     }

@@ -54,7 +54,9 @@ class Booking extends DB {
         return $this->$name;
     }
 
-
+    public function __set( $key, $data ) {
+        $this->$key = $data;
+    }
     /**
      * @param $id
      * @return Booking $this
@@ -148,6 +150,16 @@ class Booking extends DB {
         return $all;
     }
 
+    public function getBookingsByRoomId( $id ) {
+        if (is_int($id))
+            $id = '' . $id;
+        $where = $this->where('fk_rooms_id_name', $id);
+
+        $thisArray = $this->setData2($where);
+
+        return $thisArray;
+    }
+
     public function return( $id ) {
         return $this->update( [ 'returned' => 1 ], $id );
     }
@@ -179,6 +191,32 @@ class Booking extends DB {
         $this->room_type = $data[0][8];
         $this->fk_users_dni = $data[0][9];
         $this->room_name = $data[0][10];
+    }
+
+
+    /**
+     * Same as the function below but without specify the index
+     * @param $data
+     * @return array
+     */
+    private function setData2( $data ) {
+        $thisArray = [];
+        foreach( $data as $datum ) {
+            $thisTmp = new Booking();
+            $thisTmp->id = $datum[0];
+            $thisTmp->start_date = $datum[1];
+            $thisTmp->end_date = $datum[2];
+            $thisTmp->confirmed = $datum[3];
+            $thisTmp->pay_method = $datum[4];
+            $thisTmp->paid = $datum[5];
+            $thisTmp->adults_number = $datum[6];
+            $thisTmp->children_number = $datum[7];
+            $thisTmp->room_type = $datum[10];
+            $thisTmp->fk_users_dni = $datum[8];
+            $thisTmp->room_name = $datum[12];
+            $thisArray[] = $thisTmp;
+        }
+        return $thisArray;
     }
 
 }

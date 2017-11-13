@@ -46,15 +46,13 @@ class Room extends DB {
 
     /**
      * @param $id
-     * @return array|null
+     * @return Room $this
      */
     public function getById( $id ) {
         $where = $this->where( 'id', $id, $this->fields );
         $this->setData($where);
 
-
-
-        return $where;
+        return $this;
     }
 
     /**
@@ -86,7 +84,7 @@ class Room extends DB {
      * 6 => room type real name
      * @param $data
      */
-    private function setData( $data ) {
+    public function setData( $data ) {
         $this->id = $data[0];
         $this->fk_roomtypes_id_name = $data[1];
         $this->adults_max_number = $data[2];
