@@ -20,6 +20,7 @@ return [
     ],
     'Bookings' => [
         'showForms' => 1,
+        'sendMails' => 1,
         'checkAvailableRooms' => 1,
         'index' => 200,
         'booking' => 100,

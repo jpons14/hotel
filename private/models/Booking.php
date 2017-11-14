@@ -3,7 +3,6 @@
 class Booking extends DB {
 
     private $conservation;
-
     private $id;
     private $start_date;
     private $end_date;

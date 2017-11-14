@@ -24,6 +24,7 @@ $GLOBALS['usersPermission'] = include 'private/permissions/users.php';
 
 $GLOBALS['db'] = include 'private/settings/database.php';
 include 'httpful.phar';
+include 'vendor/autoload.php';
 
 foreach ( glob( __DIR__ . '/private/core/*.php' ) as $item ) {
     require_once $item;

@@ -1,6 +1,8 @@
 <?php
 
 
+use PHPMailer\PHPMailer\PHPMailer;
+
 class Bookings extends Controller {
     public function __construct( $private ) {
         parent::__construct( $private );
@@ -78,8 +80,45 @@ class Bookings extends Controller {
 
     }
 
-    private function checkAvialibity( $roomId ) {
+    public function sendMails(  ) {
+        $mail = new PHPmailer(true);
+        try{
+            $mail->SMTPDebug = 2;                                 // Enable verbose debug output
+            $mail->isSMTP();                                      // Set mailer to use SMTP
+            $mail->Host = 'smtp.mailtrap.io';  // Specify main and backup SMTP servers
+            $mail->SMTPAuth = true;                               // Enable SMTP authentication
+            $mail->Username = 'b60d9737a082fa';                 // SMTP username
+            $mail->Password = 'dd045f921efd0a';             // SMTP password
+//            $mail->setFrom('daw2jponspons@iesjoanramis.org', 'josep');
+            $mail->Subject = 'ola k ase';
+            $mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
+            $mail->Port = 465;
+            $mail->CharSet = "UTF-8";                          // TCP port to connect to
 
+            //Recipients
+            $mail->setFrom('daw2jponspons@iesjoanramis.org', 'Josep');
+            $mail->addAddress('jponspons.programming@gmail.com', 'Joe User');     // Add a recipient
+//            $mail->addAddress('ellen@example.com');               // Name is optional
+//            $mail->addReplyTo('info@example.com', 'Information');
+//            $mail->addCC('cc@example.com');
+//            $mail->addBCC('bcc@example.com');
+
+            //Attachments
+//            $mail->addAttachment('/var/tmp/file.tar.gz');         // Add attachments
+//            $mail->addAttachment('/tmp/image.jpg', 'new.jpg');    // Optional name
+
+            //Content
+            $mail->isHTML(true);                                  // Set email format to HTML
+            $mail->Subject = 'Here is the subject';
+            $mail->Body    = 'This is the HTML message body <b>in bold!</b>';
+            $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
+
+            $mail->send();
+            echo 'Message has been sent';
+        } catch(Exception $e){
+            echo 'Message could not be sent.';
+            echo 'Mailer Error: ' . $mail->ErrorInfo;
+        }
     }
 
     public function index() {
