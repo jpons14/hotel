@@ -13,7 +13,7 @@ class roomsTypesListWidget extends FatherWidget {
             $html .= <<<PHP
 <div class="card">
   <div class="card-block">
-    $datum[1] with a price of $datum[2]€ <div class="float-right"><a href="$GLOBALS[form_action]/bookings/sendMails?id=$datum[0]" class="btn btn-primary">reserve</a></div>
+    $datum[1] with a price of $datum[2]€ <div class="float-right"><a href="$GLOBALS[form_action]/bookings/confirmBooking?room_type_id=$datum[0]" class="btn btn-primary reserve">reserve</a></div>
   </div>
 </div>
 <hr />

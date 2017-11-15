@@ -361,6 +361,7 @@ class DB {
         $keys = array_keys( $array );
         $sql = "INSERT INTO " . $this->table . ' ( ' . implode( ', ', $keys ) . ' ) VALUES ( ' . implode( ', ', $array ) . ' );';
 
+//        echo '<pre>$sql' . print_r( $sql, true ) . '</pre>';die;
 
         return $this->executeUpdate( $sql );
     }

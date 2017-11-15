@@ -23,12 +23,12 @@ class Bookings extends Controller {
         $this->menu();
         new View( [ 'showDates' ], [
                 'startDate' => $_POST[ 'start_date' ],
-                'endDate' => $_POST['end_date']
+                'endDate' => $_POST[ 'end_date' ]
             ]
         );
 
         $booking = new Booking();
-//        $bookings = $booking->getBookingById(1)->start_date;
+        //        $bookings = $booking->getBookingById(1)->start_date;
         $roomTypes = new RoomType();
         /**
          * Check if in the room type is there any room with a booking between the specified dates
@@ -41,18 +41,18 @@ class Bookings extends Controller {
 
         foreach( $allRoomTypes as $key => $item ) {
             $rooms = new Room();
-            $roomsList = $rooms->where('fk_roomtypes_id_name', $item[0]);
+            $roomsList = $rooms->where( 'fk_roomtypes_id_name', $item[ 0 ] );
 
             foreach( $roomsList as $roomArray ) {
                 $tmpRoom = new Room();
-                $tmpRoom->setData($roomArray);
-                if($tmpRoom->booked == '1'){
+                $tmpRoom->setData( $roomArray );
+                if( $tmpRoom->booked == '1' ) {
                     // Check availability of this room
-                    $bookingsByRoomId = $booking->getBookingsByRoomId($tmpRoom->id);
+                    $bookingsByRoomId = $booking->getBookingsByRoomId( $tmpRoom->id );
                     foreach( $bookingsByRoomId as $value ) {
-                        $boolean = $booking->isBetweenDates( $value->start_date, $_POST['start_date'], $_POST['end_date']);
-                        $boolean2 = $booking->isBetweenDates( $value->end_date, $_POST['start_date'], $_POST['end_date']);
-                        if(!$boolean && !$boolean2) {
+                        $boolean = $booking->isBetweenDates( $value->start_date, $_POST[ 'start_date' ], $_POST[ 'end_date' ] );
+                        $boolean2 = $booking->isBetweenDates( $value->end_date, $_POST[ 'start_date' ], $_POST[ 'end_date' ] );
+                        if( !$boolean && !$boolean2 ) {
                             $resultAllRoomTypes[] = $item;
                         }
 
@@ -61,64 +61,113 @@ class Bookings extends Controller {
                     $resultAllRoomTypes[] = $item;
                 }
             }
-            
+
             // If the room types don't have any room available take it out of the array
             $counter = 0;
             foreach( $roomsList as $room ) {
                 if( $item[ 1 ] == $room[ 6 ] ) {
-                    if($room[6])
-                    $counter++;
+                    if( $room[ 6 ] )
+                        $counter++;
                 }
             }
             if( $counter == 0 )
                 unset( $allRoomTypes[ $key ] );
         }
 
-        new View( [], [], [ 'roomsTypesListWidget' => [
+        new View( [ 'roomTypesListJavascript' ], [], [ 'roomsTypesListWidget' => [
             'data' => $resultAllRoomTypes
         ] ] );
 
     }
 
-    public function sendMails(  ) {
-        $mail = new PHPmailer(true);
-        try{
+    public function sendMails() {
+        $hashDni = hash('ripemd160', $_POST['dni']);
+        $booking = new Booking();
+        $booking->insert([
+            'start_date' => $_GET['start_date'],
+            'end_date' => $_GET['end_date'],
+            'confirmed' => '0',
+            'paid' => '0',
+            'pay_method' => 'visa',
+            'adults_number' => 2,
+            'children_number' => 0,
+            'fk_users_dni_dni' => $_POST['dni'],
+            'fk_rooms_id_name' => 1,
+            'room_type' => $_GET['room_type_id']
+        ]);
+        
+        $mail = new PHPmailer( true );
+        try {
             $mail->SMTPDebug = 2;                                 // Enable verbose debug output
             $mail->isSMTP();                                      // Set mailer to use SMTP
             $mail->Host = 'smtp.mailtrap.io';  // Specify main and backup SMTP servers
             $mail->SMTPAuth = true;                               // Enable SMTP authentication
             $mail->Username = 'b60d9737a082fa';                 // SMTP username
             $mail->Password = 'dd045f921efd0a';             // SMTP password
-//            $mail->setFrom('daw2jponspons@iesjoanramis.org', 'josep');
+            //            $mail->setFrom('daw2jponspons@iesjoanramis.org', 'josep');
             $mail->Subject = 'ola k ase';
             $mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
             $mail->Port = 465;
             $mail->CharSet = "UTF-8";                          // TCP port to connect to
 
             //Recipients
-            $mail->setFrom('daw2jponspons@iesjoanramis.org', 'Josep');
-            $mail->addAddress('jponspons.programming@gmail.com', 'Joe User');     // Add a recipient
-//            $mail->addAddress('ellen@example.com');               // Name is optional
-//            $mail->addReplyTo('info@example.com', 'Information');
-//            $mail->addCC('cc@example.com');
-//            $mail->addBCC('bcc@example.com');
+            $mail->setFrom( 'daw2jponspons@iesjoanramis.org', 'Josep' );
+            $mail->addAddress( $_POST['email'], 'Joe User' );     // Add a recipient
+            //            $mail->addAddress('ellen@example.com');               // Name is optional
+            //            $mail->addReplyTo('info@example.com', 'Information');
+            //            $mail->addCC('cc@example.com');
+            //            $mail->addBCC('bcc@example.com');
 
             //Attachments
-//            $mail->addAttachment('/var/tmp/file.tar.gz');         // Add attachments
-//            $mail->addAttachment('/tmp/image.jpg', 'new.jpg');    // Optional name
+            //            $mail->addAttachment('/var/tmp/file.tar.gz');         // Add attachments
+            //            $mail->addAttachment('/tmp/image.jpg', 'new.jpg');    // Optional name
 
             //Content
-            $mail->isHTML(true);                                  // Set email format to HTML
+            $mail->isHTML( true );                                  // Set email format to HTML
             $mail->Subject = 'Here is the subject';
-            $mail->Body    = 'This is the HTML message body <b>in bold!</b>';
+            $mail->Body = "<a href='http://hotel.dev/bookings/confirmBookingDNIForm?dni=$hashDni'>Confirm</a>";
             $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
 
             $mail->send();
             echo 'Message has been sent';
-        } catch(Exception $e){
+        } catch( Exception $e ) {
             echo 'Message could not be sent.';
             echo 'Mailer Error: ' . $mail->ErrorInfo;
         }
+        header('Location: ' . FORM_ACTION . '/');
+    }
+
+    public function confirmBookingDNIForm(  ) {
+        $this->menu();
+        new View(['confirmBookingDNIForm'], ['dni' => $_GET['dni']]);
+    }
+
+    public function confirmBookingDNI(  ) {
+        $this->menu();
+        if(hash('ripemd160', $_POST['dni']) == $_GET['dni']){
+            $booking = new Booking();
+            $booking->update(['confirmed' => '1'], 2);
+            new VIew(['confirmed'], ['message' => 'PERFECT Booking confirmed']);
+        } else {
+            new VIew(['confirmed'], ['message' => 'ERROR the DNI introduced is not correct']);
+        }
+    }
+
+    public function confirmBooking() {
+        $this->menu();
+        $roomType = new RoomType();
+        $roomTypes = $roomType->getById( $_GET[ 'room_type_id' ] );
+
+        $days = strtotime($_GET['end_date']) - strtotime($_GET['start_date']);
+        $numberDays = $days/86400;
+
+        new View( [ 'confirmBooking' ], [
+            'startDate' => $_GET[ 'start_date' ],
+            'endDate' => $_GET[ 'end_date' ],
+            'roomType' => $roomTypes[0][1],
+            'price' => $numberDays * $roomTypes[0][2],
+        ] );
+
     }
 
     public function index() {
