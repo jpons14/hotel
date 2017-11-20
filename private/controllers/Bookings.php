@@ -38,10 +38,10 @@ class Bookings extends Controller {
 
         $resultAllRoomTypes = [];
 
-
+        # Loop through all the room types
         foreach( $allRoomTypes as $key => $item ) {
             $rooms = new Room();
-            $roomsList = $rooms->where( 'fk_roomtypes_id_name', $item[ 0 ] );
+            $roomsList = $rooms->whereFkRoomTypesIdNameId( $item[ 0 ] );
 
             foreach( $roomsList as $roomArray ) {
                 $tmpRoom = new Room();
@@ -53,7 +53,8 @@ class Bookings extends Controller {
                         $boolean = $booking->isBetweenDates( $value->start_date, $_POST[ 'start_date' ], $_POST[ 'end_date' ] );
                         $boolean2 = $booking->isBetweenDates( $value->end_date, $_POST[ 'start_date' ], $_POST[ 'end_date' ] );
                         if( !$boolean && !$boolean2 ) {
-                            $resultAllRoomTypes[] = $item;
+                            # If i set this key will not be repeated the values
+                            $resultAllRoomTypes[ $item[ 1 ] ] = $item;
                         }
 
                     }
@@ -73,7 +74,7 @@ class Bookings extends Controller {
             if( $counter == 0 )
                 unset( $allRoomTypes[ $key ] );
         }
-
+        echo '<pre>$resultAllRoomTypes' . print_r( $resultAllRoomTypes, true ) . '</pre>';
         new View( [ 'roomTypesListJavascript' ], [], [ 'roomsTypesListWidget' => [
             'data' => $resultAllRoomTypes
         ] ] );
@@ -81,21 +82,24 @@ class Bookings extends Controller {
     }
 
     public function sendMails() {
-        $hashDni = hash('ripemd160', $_POST['dni']);
+        $hashDni = hash( 'ripemd160', $_POST[ 'dni' ] );
         $booking = new Booking();
-        $booking->insert([
-            'start_date' => $_GET['start_date'],
-            'end_date' => $_GET['end_date'],
+        $bookingID = $booking->insertAndGetInsertedId( [
+            'start_date' => $_GET[ 'start_date' ],
+            'end_date' => $_GET[ 'end_date' ],
             'confirmed' => '0',
             'paid' => '0',
             'pay_method' => 'visa',
             'adults_number' => 2,
             'children_number' => 0,
-            'fk_users_dni_dni' => $_POST['dni'],
+            'fk_users_dni_dni' => $_POST[ 'dni' ],
             'fk_rooms_id_name' => 1,
-            'room_type' => $_GET['room_type_id']
-        ]);
-        
+            'room_type' => $_GET[ 'room_type_id' ]
+        ] );
+
+        //        $b = $booking->allByUser2($_POST['dni']);
+        $this->session->setVar( 'bid', $bookingID );
+
         $mail = new PHPmailer( true );
         try {
             $mail->SMTPDebug = 2;                                 // Enable verbose debug output
@@ -104,7 +108,6 @@ class Bookings extends Controller {
             $mail->SMTPAuth = true;                               // Enable SMTP authentication
             $mail->Username = 'b60d9737a082fa';                 // SMTP username
             $mail->Password = 'dd045f921efd0a';             // SMTP password
-            //            $mail->setFrom('daw2jponspons@iesjoanramis.org', 'josep');
             $mail->Subject = 'ola k ase';
             $mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
             $mail->Port = 465;
@@ -112,20 +115,11 @@ class Bookings extends Controller {
 
             //Recipients
             $mail->setFrom( 'daw2jponspons@iesjoanramis.org', 'Josep' );
-            $mail->addAddress( $_POST['email'], 'Joe User' );     // Add a recipient
-            //            $mail->addAddress('ellen@example.com');               // Name is optional
-            //            $mail->addReplyTo('info@example.com', 'Information');
-            //            $mail->addCC('cc@example.com');
-            //            $mail->addBCC('bcc@example.com');
+            $mail->addAddress( $_POST[ 'email' ], 'Joe User' );     // Add a recipient
 
-            //Attachments
-            //            $mail->addAttachment('/var/tmp/file.tar.gz');         // Add attachments
-            //            $mail->addAttachment('/tmp/image.jpg', 'new.jpg');    // Optional name
-
-            //Content
             $mail->isHTML( true );                                  // Set email format to HTML
             $mail->Subject = 'Here is the subject';
-            $mail->Body = "<a href='http://hotel.dev/bookings/confirmBookingDNIForm?dni=$hashDni'>Confirm</a>";
+            $mail->Body = "Hello <a href='http://hotel.dev/bookings/confirmBookingDNIForm?dni=$hashDni&bid={$bookingID}'>Confirm</a>";
             $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
 
             $mail->send();
@@ -134,22 +128,27 @@ class Bookings extends Controller {
             echo 'Message could not be sent.';
             echo 'Mailer Error: ' . $mail->ErrorInfo;
         }
-        header('Location: ' . FORM_ACTION . '/');
+        //        $user = new User($_POST['email'], '', $_POST['dni'], true);
+
+        header( 'Location: ' . FORM_ACTION . '/' );
     }
 
-    public function confirmBookingDNIForm(  ) {
+    public function confirmBookingDNIForm() {
         $this->menu();
-        new View(['confirmBookingDNIForm'], ['dni' => $_GET['dni']]);
+        $bid = $this->session->getVar( 'bid' );
+        echo '<pre>$bid' . print_r( $bid, true ) . '</pre>';
+
+        new View( [ 'confirmBookingDNIForm' ], [ 'dni' => $_GET[ 'dni' ], 'bid' => $_GET[ 'bid' ] ] );
     }
 
-    public function confirmBookingDNI(  ) {
+    public function confirmBookingDNI() {
         $this->menu();
-        if(hash('ripemd160', $_POST['dni']) == $_GET['dni']){
+        if( hash( 'ripemd160', $_POST[ 'dni' ] ) == $_GET[ 'dni' ] ) {
             $booking = new Booking();
-            $booking->update(['confirmed' => '1'], 2);
-            new VIew(['confirmed'], ['message' => 'PERFECT Booking confirmed']);
+            $booking->update( [ 'confirmed' => '1' ], $_GET[ 'bid' ] );
+            new VIew( [ 'confirmed' ], [ 'message' => 'PERFECT Booking confirmed' ] );
         } else {
-            new VIew(['confirmed'], ['message' => 'ERROR the DNI introduced is not correct']);
+            new VIew( [ 'confirmed' ], [ 'message' => 'ERROR the DNI introduced is not correct' ] );
         }
     }
 
@@ -158,16 +157,31 @@ class Bookings extends Controller {
         $roomType = new RoomType();
         $roomTypes = $roomType->getById( $_GET[ 'room_type_id' ] );
 
-        $days = strtotime($_GET['end_date']) - strtotime($_GET['start_date']);
-        $numberDays = $days/86400;
+        $days = strtotime( $_GET[ 'end_date' ] ) - strtotime( $_GET[ 'start_date' ] );
+        $numberDays = $days / 86400;
 
         new View( [ 'confirmBooking' ], [
             'startDate' => $_GET[ 'start_date' ],
             'endDate' => $_GET[ 'end_date' ],
-            'roomType' => $roomTypes[0][1],
-            'price' => $numberDays * $roomTypes[0][2],
+            'roomType' => $roomTypes[ 0 ][ 1 ],
+            'price' => $numberDays * $roomTypes[ 0 ][ 2 ],
         ] );
 
+    }
+
+    public function loginByDNIForm() {
+        $this->menu();
+        new View( [ 'loginByDNIForm' ] );
+    }
+
+    public function loginByDNI() {
+        $this->menu();
+        $booking = new Booking();
+        $bookings = $booking->where( 'fk_users_dni_dni', $_POST[ 'dni' ] );
+        echo '<pre>$bookings[0]' . print_r( $bookings, true ) . '</pre>';
+        //        new View( [], [], [ 'TableWidget' => [
+        //            'id' => $bookings->id
+        //        ] ] );
     }
 
     public function index() {
@@ -341,24 +355,26 @@ class Bookings extends Controller {
 
     public function currentUser() {
         $booking = new Booking();
-        $history = $booking->allByUser( $this->session->getVar( 'userEmail' ) );
+        $history = $booking->bookingsWhere('fk_users_dni_dni', $this->session->getVar( 'userDNI' ) );
 
-        foreach( $history as $index => $item ) {
+//        echo '<pre>$history' . print_r( $history, true ) . '</pre>';
 
+//        foreach( $history as $index => $item ) {
+//            if( strtotime( date( 'm/d/Y' ) ) == strtotime( $item[ 4 ] ) ) {
+//                $history[ $index ][ 4 ] = '<div class="alert alert-warning">' . $item[ 4 ] . '</div>';
+//            } elseif( strtotime( date( 'm/d/Y' ) ) > strtotime( $item[ 4 ] ) ) {
+//                $history[ $index ][ 4 ] = '<div class="alert alert-danger">' . $item[ 4 ] . '</div>';
+//            }
+//        }
 
-            if( strtotime( date( 'm/d/Y' ) ) == strtotime( $item[ 4 ] ) ) {
-                $history[ $index ][ 4 ] = '<div class="alert alert-warning">' . $item[ 4 ] . '</div>';
-            } elseif( strtotime( date( 'm/d/Y' ) ) > strtotime( $item[ 4 ] ) ) {
-                $history[ $index ][ 4 ] = '<div class="alert alert-danger">' . $item[ 4 ] . '</div>';
-            }
-        }
+        echo '<pre>$history[0]->toArray()' . print_r( $history[0]->toArray(), true ) . '</pre>';
 
         new View( [ 'header' ], [], [ 'MenuWidget' => [
             'userType' => $this->session->getVar( 'userType' )
         ] ] );
 
         new View( [ 'bookingsSearchOnlyID' ], [], [ 'TableWidget' => [
-            'fields' => [ 'id', 'Book ID', 'User Email', 'Pick Up', 'Pick Off' ],
+            'fields' => [ 'id', 'Start Date', 'End Date', 'Confirmed', 'Pay method', 'Paid?', 'Adults Num', 'Children Num', 'DNI', 'Room ID', 'Room Type ID' ],
             'values' => $history
         ] ] );
     }

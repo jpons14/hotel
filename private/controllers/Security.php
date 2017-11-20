@@ -37,7 +37,7 @@ class Security {
                     $this->private = true;
                     return true; // private although the user has enough permissions
                 } else {
-                    throw new Exception( 'You don\'t have enough permissions to do that' );
+                    throw new PermissionException( 'You don\'t have enough permissions to do that' );
 
                     return false;
                 }

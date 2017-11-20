@@ -21,9 +21,11 @@ return [
     'Bookings' => [
         'showForms' => 1,
         'sendMails' => 1,
-        'confirmBooking' => 1,
+        'confirmBooking' => 100,
         'confirmBookingDNIForm' => 1,
         'confirmBookingDNI' => 1,
+        'loginByDNI' => 1,
+        'loginByDNIForm' => 1,
         'checkAvailableRooms' => 1,
         'index' => 200,
         'booking' => 100,

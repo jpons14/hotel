@@ -6,6 +6,7 @@
         <h1 class="display-3">Price: <span class="end_date">[[ price ]]€</span></h1>
     </div>
 </div>
+<div class="container">
 <form action="[[ formAction ]]/bookings/sendMails" method="post">
     <div class="form-group">
         <input type="text" name="dni" class="from-control" placeholder="DNI"/>
@@ -17,7 +18,7 @@
         <input type="submit" class="btn btn-default" value="Confirm"/>
     </div>
 </form>
-
+</div>
 <script>
     var url = window.location.href;
     url = url.split('?')[1];

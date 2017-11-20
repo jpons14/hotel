@@ -18,7 +18,7 @@
 
 <div class="container">
 <h1>Login</h1>
-<form action="[[ formAction ]]/users/doLogin" method="POST">
+<form action="[[ formAction ]]/users/doLogin?message=[[ message ]]" method="POST">
     <div class="form-group">
         <label for="email">Email</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <input class="form-control" type="email" id="email" name="email" placeholder="email"/>
@@ -30,7 +30,7 @@
     </div>
     <input class="btn btn-default" type="submit" value="Login"/>
 </form>
-<a href="[[ formAction ]]/users/register">Register</a>
+<a href="[[ formAction ]]/users/register?message=[[ message ]]">Register</a>
 </div>
 </body>
 </html>

@@ -4,6 +4,7 @@ class User extends DB {
     private $name;
     private $email;
     private $password;
+    private $dni;
 
     private $userId;
 
@@ -24,12 +25,13 @@ class User extends DB {
      * If all go well, it will start session
      *
      * User constructor.
+     * @param string $dni
      * @param string $email
      * @param string $name
      * @param string $password
      * @param bool $register
      */
-    public function __construct( $email, $name = '', $password = '', $register = false ) {
+    public function __construct($email, $name = '', $password = '', $dni = '', $register = false ) {
         parent::__construct();
         $this->email = $email;
         $this->justEmail = false;
@@ -40,6 +42,7 @@ class User extends DB {
             } else {
                 $this->name = $name;
                 $this->password = $password;
+                $this->dni = $dni;
                 if( $register ) {
                     $this->_doRegister();
                 } else {
@@ -100,6 +103,10 @@ class User extends DB {
         return $this->email;
     }
 
+    public function getDNI(  ) {
+        return $this->dni;
+    }
+    
 
     public function getPassword() {
         return $this->password;
@@ -130,7 +137,7 @@ class User extends DB {
         if( count( $emailValidation ) === 1 ) {
             if( password_verify( $password, $emailValidation[ 0 ][ 5 ] ) ) {
                 $this->userId = $emailValidation[ 0 ][ 0 ];
-
+                $this->dni = $emailValidation[ 0 ][ 0 ];
                 return true;
             } else //wrong password
                 throw new DBException( 'Wrong password' );
@@ -189,13 +196,13 @@ class User extends DB {
         if( $this->isUser() ) {
             throw new DBException( 'This user already exists' );
         } else {
-            $values[ 'dni' ] = '41609409v';
+            $values[ 'dni' ] = $this->dni;
             $values[ 'name' ] = $this->name;
             $values[ 'surnames' ] = $this->name;
             $values[ 'email' ] = $this->email;
             $values[ 'phone' ] = '666666666';
             $values[ 'password' ] = $this->password;
-            $values[ 'user_type_id' ] = '1';
+            $values[ 'fk_usertypes_id_usertypename' ] = '3';
 
             return $this->insert( $values );
         }

@@ -11,7 +11,10 @@
 <body>
 <div class="container">
 <h1>Register</h1>
-<form action="[[ formAction ]]/users/doRegister" method="POST">
+<form action="[[ formAction ]]/users/doRegister?message=[[ message ]]" method="POST">
+    <div class="form-group">
+        <input class="form-control" type="text" name="dni" placeholder="DNI">
+    </div>
     <div class="form-group">
         <input class="form-control" type="text" name="name" placeholder="name">
     </div>

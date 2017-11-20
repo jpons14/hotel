@@ -2,7 +2,6 @@
 
 class Booking extends DB {
 
-    private $conservation;
     private $id;
     private $start_date;
     private $end_date;
@@ -15,6 +14,12 @@ class Booking extends DB {
     private $fk_users_dni;
     private $room_name;
 
+    protected $hidden = [
+        'fields',
+        'timestamps',
+        'hasId',
+        'hidden'
+    ];
 
     /**
      * 0 => id
@@ -41,12 +46,6 @@ class Booking extends DB {
             $e->showException();
         }
 
-        $this->conservation = [
-            'old' => 5,
-            'normal' => 10,
-            'new' => 20
-        ];
-
     }
 
     public function __get( $name ) {
@@ -69,16 +68,25 @@ class Booking extends DB {
         return $this;
     }
 
+    public function bookingsWhere($field2Search, $value2Search ) {
+        $where = $this->where($field2Search, $value2Search);
+        return $this->setData2($where);
+    }
+
     public function getAllBookings( $elements = [] ) {
         if(empty($elements) || $elements == [])
             $elements = $this->fields;
         return $this->select( $elements );
     }
 
-    public function allByUser( $userEmail ) {
-        return $this->whereOrderBy( 'user_email', $userEmail, 'DESC' );
+    public function allByUser( $userDNI ) {
+        return $this->whereOrderBy( 'fk_users_dni_dni', $userDNI, 'DESC' );
     }
 
+    public function allByUser2( $userDni ) {
+        $this->setData( $this->whereOrderBy( 'fk_users_dni_dni', $userDni, 'DESC' )[0]);
+        return $this;
+    }
     public function newBooking( array $elements ) {
         try {
             if( $this->isBooked( $elements ) ) {
@@ -218,4 +226,18 @@ class Booking extends DB {
         return $thisArray;
     }
 
+    /**
+     * TODO: Put this method in the parent class
+     * @return array
+     */
+    public function toArray(  ) {
+        $attributes = get_object_vars($this);
+        $array = array();
+        foreach( $attributes as $index => $attribute ) {
+            if(!in_array($index, $this->hidden))
+                $array[$index] = $attribute;
+        }
+
+        return $array;
+    }
 }

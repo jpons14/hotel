@@ -9,10 +9,17 @@ class Users extends Controller {
     // Permission = true
     public function login() {
 
-        $user = new User('jponspons@gmail.com');
+        if( isset( $_GET[ 'from' ] ) && $_GET[ 'from' ] == 'nep' )
+            echo '<pre>$_COOKIE' . print_r( $_COOKIE, true ) . '</pre>';
+
+        $user = new User( 'jponspons@gmail.com' );
         $user->getAll();
 
-        $view = new View( [ 'loginForm' ] );
+        if(isset($_GET['message']) && $$_GET['message'] == 'nep')
+            $message = 'nep';
+        else
+            $message = '';
+        $view = new View( [ 'loginForm' ], [ 'message' => $message ] );
     }
 
 
@@ -23,13 +30,32 @@ class Users extends Controller {
         if( $_SERVER[ 'REQUEST_METHOD' ] == 'POST' ) {
 
             $user = new User( $_POST[ 'email' ], 'name', $_POST[ 'password' ] ); // session started
+
             if( !$user->getJustEmail() ) {
                 $this->set2Session( $user );
-                header( "Location: " . FORM_ACTION . "/books/index" );
+                if( isset($_GET['message']) && $_GET[ 'message' ] == 'nep' ) {
+                    $nep = json_decode( $_COOKIE[ 'nep_get' ], true );
+                    echo '<pre>$nep' . print_r( $nep, true ) . '</pre>';
+                    $ca = "/{$nep['controller']}/{$nep['action']}";
+                    unset( $nep[ 'controller' ] );
+                    unset( $nep[ 'action' ] );
+                    $params = [];
+                    foreach( $nep as $index => $item ) {
+                        $params[] = $index . '=' . $item;
+                    }
+                    $params = implode( '&', $params );
+                    header( "Location: " . FORM_ACTION . "{$ca}?{$params}" );
+                } else {
+                    header( "Location: " . FORM_ACTION . "/books/index" );
+                }
             }
             if( $user->getRegistered() ) {
-                header( "Location: " . FORM_ACTION . "/users/login" );
-                die;
+                $params = '';
+                if( isset($_GET['message']) && $_GET[ 'message' ] == 'nep' ) {
+                    $params = '?message=nep';
+                }
+                    header( "Location: " . FORM_ACTION . "/users/login?{$params}" );
+                    die;
             }
         }
     }
@@ -40,12 +66,17 @@ class Users extends Controller {
         $this->session->setVar( 'logged', 'true' );
         $this->session->setVar( 'userId', $user->getUserId() );
         $this->session->setVar( 'userEmail', $user->getEmail() );
+        $this->session->setVar( 'userDNI', $user->getDNI() );
         $this->session->setVar( 'userName', $user->getName() );
     }
 
     // permission = true
     public function register() {
-        return new View( [ 'registerForm' => 'registerForm' ] );
+        if(isset($_GET['message']))
+            $message = $_GET['message'];
+        else
+            $message = '';
+            return new View( [ 'registerForm' => 'registerForm' ], ['message' => $message] );
     }
 
     public function create() {
@@ -62,11 +93,11 @@ class Users extends Controller {
         // do the register and
         // redirect to login
         $passwordHashed = password_hash( $_POST[ 'password' ], PASSWORD_BCRYPT );
-        $user = new User( $_POST[ 'email' ], $_POST[ 'name' ], $passwordHashed, true );
+        $user = new User($_POST[ 'email' ], $_POST[ 'name' ], $passwordHashed, $_POST['dni'], true );
         if( isset( $_GET[ 'from' ] ) && $_GET[ 'from' ] == 'createUser' ) {
             header( "Location: " . FORM_ACTION . "/users/allUsers" );
         } else {
-            header( "Location: " . FORM_ACTION . "/users/login" );
+            header( "Location: " . FORM_ACTION . "/users/login?message={$_GET['message']}" );
         }
     }
 

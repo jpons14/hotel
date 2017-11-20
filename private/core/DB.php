@@ -235,13 +235,13 @@ class DB {
         foreach( $fks as $fk ) {
             $in = explode( '_', $fk );
             $temporalSelect[] = $in[ 1 ] . '.' . $in[ 3 ];
-            $temporalFrom[] = $in[1];
-            $temporalWhere[] = $this->table . '.' . $fk . ' = ' . $in[1] . '.' . $in[2];
+            $temporalFrom[] = $in[ 1 ];
+            $temporalWhere[] = $this->table . '.' . $fk . ' = ' . $in[ 1 ] . '.' . $in[ 2 ];
         }
 
         $fksSelect = implode( ',', $temporalSelect );
-        $fksFrom = implode(',', $temporalFrom);
-        $fksWhere = implode(' AND ', $temporalWhere);
+        $fksFrom = implode( ',', $temporalFrom );
+        $fksWhere = implode( ' AND ', $temporalWhere );
 
         //        $tmp = explode( '_', $fks[ 0 ] );
 
@@ -255,18 +255,18 @@ class DB {
         $select = rtrim( $select, ',' );
 
         $from = $this->table . ',' . $fksFrom;
-        $from = rtrim($from, ',');
+        $from = rtrim( $from, ',' );
 
         $where = "{$this->table}. `$fieldNameWhere` = '$valueWhere' AND $fksWhere";
-        $where = rtrim($where, ' AND ');
+        $where = rtrim( $where, ' AND ' );
 
-        $this->buildWhere("$this->table WHERE {$this->table}.`$fieldNameWhere` = '$valueWhere'");
+        $this->buildWhere( "$this->table WHERE {$this->table}.`$fieldNameWhere` = '$valueWhere'" );
 
-        
-        $tmpSql = "SELECT " . $this->buildSelect() . " FROM " . $this->buildFrom() . " WHERE " .  $this->buildWhere("{$this->table}.`$fieldNameWhere` = '$valueWhere'");
-        $q = $this->executeQuery($tmpSql);
 
-        
+        $tmpSql = "SELECT " . $this->buildSelect() . " FROM " . $this->buildFrom() . " WHERE " . $this->buildWhere( "{$this->table}.`$fieldNameWhere` = '$valueWhere'" );
+        $q = $this->executeQuery( $tmpSql );
+
+
         if( !empty( $fks ) )
             $sql = "SELECT $select FROM $from WHERE $where";
         else
@@ -329,6 +329,7 @@ class DB {
             $sql = "SELECT $fields FROM $this->table WHERE `$fieldName` = '$value' ORDER BY $orderBy $order";
 
 
+
         return $this->executeQuery( $sql );
     }
 
@@ -361,9 +362,38 @@ class DB {
         $keys = array_keys( $array );
         $sql = "INSERT INTO " . $this->table . ' ( ' . implode( ', ', $keys ) . ' ) VALUES ( ' . implode( ', ', $array ) . ' );';
 
-//        echo '<pre>$sql' . print_r( $sql, true ) . '</pre>';die;
+        ////        echo '<pre>$sql' . print_r( $sql, true ) . '</pre>';die;
 
         return $this->executeUpdate( $sql );
+    }
+
+    public function insertAndGetInsertedId( $values = [] ) {
+        if( empty( $values ) ) {
+            throw new DBException( '$values is empty' );
+
+            return;
+        }
+        if( !is_array( $values ) ) {
+            throw new DBException( '$values has to be an array' );
+
+            return;
+        }
+        if( count( $values ) > $this->countNumFields() ) {
+            throw new DBException( '$values has to many fields' );
+
+            return;
+        }
+        $array = array();
+        foreach( $values as $index => $value ) {
+            $array[ '`' . $index . '`' ] = '\'' . $value . '\'';
+        }
+        $keys = array_keys( $array );
+        $sql = "INSERT INTO " . $this->table . ' ( ' . implode( ', ', $keys ) . ' ) VALUES ( ' . implode( ', ', $array ) . ' );';
+
+        //        echo '<pre>$sql' . print_r( $sql, true ) . '</pre>';die;
+
+        $this->executeUpdate( $sql );
+        return mysqli_insert_id( $this->connection );
     }
 
     /**
@@ -454,10 +484,10 @@ class DB {
         }
 
         foreach( $fields as $index => $field ) {
-            $fields[$index] = $this->table . '.' . $field;
+            $fields[ $index ] = $this->table . '.' . $field;
         }
 
-        $toReturn = implode(',', $fields);
+        $toReturn = implode( ',', $fields );
 
         $temporalSelect = [];
 
@@ -493,15 +523,16 @@ class DB {
 
         foreach( $fks as $fk ) {
             $in = explode( '_', $fk );
-            $temporalFrom[] = $in[1];
+            $temporalFrom[] = $in[ 1 ];
         }
-        $fksFrom = implode(',', $temporalFrom);
+        $fksFrom = implode( ',', $temporalFrom );
 
         $from = $this->table . ',' . $fksFrom;
-        $from = rtrim($from, ',');
+        $from = rtrim( $from, ',' );
 
         return $from;
     }
+
     private function buildWhere( $initialWhere, $fields = [] ) {
         if( !is_array( $fields ) )
             throw new NoCompatibleVarTypeException( '$rawFields is not an array' );
@@ -521,14 +552,14 @@ class DB {
 
         foreach( $fks as $fk ) {
             $in = explode( '_', $fk );
-            $temporalWhere[] = $this->table . '.' . $fk . ' = ' . $in[1] . '.' . $in[2];
+            $temporalWhere[] = $this->table . '.' . $fk . ' = ' . $in[ 1 ] . '.' . $in[ 2 ];
         }
 
-        $fksWhere = implode(' AND ', $temporalWhere);
+        $fksWhere = implode( ' AND ', $temporalWhere );
 
         $where = "$initialWhere AND $fksWhere";
-        $where = rtrim($where, ' AND ');
-        
+        $where = rtrim( $where, ' AND ' );
+
         return $where;
     }
 
@@ -595,6 +626,7 @@ class DB {
     }
 
     /**
+     * Execute query and return the values generated by the query
      * @param $sql
      * @return array|null
      */
@@ -603,6 +635,7 @@ class DB {
     }
 
     /**
+     * Only execute the query
      * @param $sql
      * @return bool|mysqli_result
      */

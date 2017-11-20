@@ -46,6 +46,7 @@ CODE;
         if( $GLOBALS[ 'usersPermission' ][ $this->vars[ 'userType' ] ] == $GLOBALS[ 'usersPermission' ][ 'non-member' ] ) {
             $this->return .= <<<CODE
                 <li class="nav-item"><a class="nav-link" href="$GLOBALS[formAction]/users/login">Login</a></li>
+                <li class="nav-item"><a class="nav-link" href="$GLOBALS[formAction]/bookings/loginByDNIForm">Your Bookings</a></li>
 CODE;
         }
     }

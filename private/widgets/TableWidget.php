@@ -34,6 +34,10 @@ class TableWidget extends FatherWidget
 
         foreach ( $this->vars['values'] as $index => $value ) {
             $return .= '<tr>';
+            # TODO: I have to check the instance of the class
+            if(is_object($value)){
+                $value = $value->toArray();
+            }
             foreach ( $value as $item ) {
                 $return .= "<td>$item</td>";
             }
