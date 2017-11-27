@@ -3,14 +3,14 @@
 class UserType extends DB{
     public function __construct() {
         parent::__construct();
-        $this->setTable('user_types');
-        $this->setFields(['user_type_name', 'permissions']);
+        $this->setTable('usertypes');
+        $this->setFields(['id', 'usertypename', 'permissions']);
     }
 
     public function getAll(  ) {
         $result = [];
         foreach( $this->select() as $key => $item ) {
-            $result[$item[0]] = $item[1];
+            $result[$item[1]] = $item[0];
         }
         return $result;
     }

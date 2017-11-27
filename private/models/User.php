@@ -35,7 +35,7 @@ class User extends DB {
         parent::__construct();
         $this->email = $email;
         $this->justEmail = false;
-        try {
+//        try {
             $this->fields = [ 'dni', 'name', 'surnames', 'email', 'phone', 'password', 'fk_usertypes_id_usertypename' ];
             if( $name == '' && $password == '' ) {
                 $this->justEmail = true;
@@ -50,9 +50,9 @@ class User extends DB {
                 }
             }
 
-        } catch( DBException $e ) {
-            $e->showException();
-        }
+//        } catch( DBException $e ) {
+//            $e->showException();
+//        }
 
     }
 
@@ -142,7 +142,7 @@ class User extends DB {
             } else //wrong password
                 throw new DBException( 'Wrong password' );
         } elseif( count( $emailValidation ) === 0 ) //wrong username
-            throw new DBException( 'Wrong username' );
+            throw new Exception( 'Wrong username' );
         else //Database exception
             throw new DBException( 'More than one item with the same ID in the DB' );
     }
@@ -171,8 +171,7 @@ class User extends DB {
         
         $return = $this->where( 'email', $this->email );
 
-        echo '<pre>$return' . print_r( $return, true ) . '</pre>';
-        
+
         $this->userId = $return[ 0 ][ 0 ];
         $this->name = $return[ 0 ][ 1 ];
         $this->surnames = $return[ 0 ][ 2 ];
@@ -237,12 +236,16 @@ class User extends DB {
     }
 
 
+    /**
+     * @param $value
+     * @param $userId
+     * @return array
+     */
     public function setUserType( $value, $userId ) {
-        echo gettype( $userId );
         if( !isset( $this->userId ) )
             $this->getUserDataById( (int)$userId );
 
-        return $this->update( [ 'user_type' => (string)$value ], $this->userId );
+        return $this->update( [ 'fk_usertypes_id_usertypename' => (string)$value ], $this->userId, 'dni' );
     }
 
     public function unregister() {

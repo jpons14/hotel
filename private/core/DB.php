@@ -206,14 +206,18 @@ class DB {
             throw new DBException( '$value has to be a String' );
         if( $table != '' )
             $this->setTable( $table );
-        if( $fields == [] )
+        if( $fields == [] ){
             $fields = $this->fields;
+            $rawFieldsBool = false;
+        } else{
+            $rawFieldsBool = true;
+        }
 
         $temporal = [];
 
 
-        $tmpFunc = $this->tmpFunc( $fields );
-        $tmpFunc = rtrim( $tmpFunc, ", " );
+//        $tmpFunc = $this->tmpFunc( $fields );
+//        $tmpFunc = rtrim( $tmpFunc, ", " );
 
 
         $toReturn = implode( ',', $fields );
@@ -232,6 +236,7 @@ class DB {
         $temporalWhere = [];
 
 
+
         foreach( $fks as $fk ) {
             $in = explode( '_', $fk );
             $temporalSelect[] = $in[ 1 ] . '.' . $in[ 3 ];
@@ -242,7 +247,7 @@ class DB {
         $fksSelect = implode( ',', $temporalSelect );
         $fksFrom = implode( ',', $temporalFrom );
         $fksWhere = implode( ' AND ', $temporalWhere );
-
+        
         //        $tmp = explode( '_', $fks[ 0 ] );
 
 
@@ -254,16 +259,17 @@ class DB {
         $select = $toReturn . ',' . $fksSelect;
         $select = rtrim( $select, ',' );
 
+
         $from = $this->table . ',' . $fksFrom;
         $from = rtrim( $from, ',' );
 
         $where = "{$this->table}. `$fieldNameWhere` = '$valueWhere' AND $fksWhere";
         $where = rtrim( $where, ' AND ' );
 
-        $this->buildWhere( "$this->table WHERE {$this->table}.`$fieldNameWhere` = '$valueWhere'" );
+        $this->buildWhere( "$this->table WHERE {$this->table}.`$fieldNameWhere` = '$valueWhere'", $fields );
 
 
-        $tmpSql = "SELECT " . $this->buildSelect() . " FROM " . $this->buildFrom() . " WHERE " . $this->buildWhere( "{$this->table}.`$fieldNameWhere` = '$valueWhere'" );
+        $tmpSql = "SELECT " . $this->buildSelect(!$rawFieldsBool ? $this->rawFields : $fields) . " FROM " . $this->buildFrom() . " WHERE " . $this->buildWhere( "{$this->table}.`$fieldNameWhere` = '$valueWhere'" );
         $q = $this->executeQuery( $tmpSql );
 
 
@@ -271,7 +277,7 @@ class DB {
             $sql = "SELECT $select FROM $from WHERE $where";
         else
             $sql = $tmpSql;
-
+        
         return $this->executeQuery( $sql );
     }
 
@@ -427,7 +433,6 @@ class DB {
 
         $sql = "UPDATE $this->table SET " . implode( ' , ', $array ) . ' WHERE `' . $idName . '` = \'' . $id . '\';';
 
-
         return $this->executeUpdate( $sql );
     }
 
@@ -471,8 +476,9 @@ class DB {
     private function buildSelect( $fields = [] ) {
         if( !is_array( $fields ) )
             throw new NoCompatibleVarTypeException( '$rawFields is not an array' );
-        if( $fields === [] )
+        if( $fields === [] ) {
             $fields = $this->rawFields;
+        }
 
         $fks = [];
 
@@ -631,7 +637,9 @@ class DB {
      * @return array|null
      */
     private function executeQuery( $sql ) {
+        try {
         return mysqli_fetch_all( mysqli_query( $this->connection, $sql ) );
+        } catch (Exception $e){}
     }
 
     /**

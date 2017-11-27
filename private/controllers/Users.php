@@ -150,19 +150,23 @@ class Users extends Controller {
                 $userEmail = $this->session->getVar( 'userEmail' );
             }
 
-            $ficheroSubido = IMG_USERS . basename( $userEmail . '.jpg' );
-            if( move_uploaded_file( $_FILES[ 'userImage' ][ 'tmp_name' ], $ficheroSubido ) ) {
-                echo "El fichero es válido y se subió con éxito.\n";
-            } else {
-                echo "¡Posible ataque de subida de ficheros!\n";
-            }
+//            $ficheroSubido = IMG_USERS . basename( $userEmail . '.jpg' );
+//            if( move_uploaded_file( $_FILES[ 'userImage' ][ 'tmp_name' ], $ficheroSubido ) ) {
+//                echo "El fichero es válido y se subió con éxito.\n";
+//            } else {
+//                echo "¡Posible ataque de subida de ficheros!\n";
+//            }
 
+            $userTypes = new UserType();
+            $types = $userTypes->getAll();
+            $type = $types[$_POST['userType']];
+            
             $user = new User( $userEmail );
             $user->setName( $_POST[ 'name' ] );
             $user->setAddress( $_POST[ 'address' ] );
             $user->setPhone( $_POST[ 'phone' ] );
             if( isset( $_POST[ 'userType' ] ) ) {
-                $user->setUserType( $_POST[ 'userType' ], $user->getUserId() );
+                $user->setUserType( $type, $user->getUserId() );
                 header( "Location: " . FORM_ACTION . "/users/allUsers" );
             } else {
                 header( "Location: " . FORM_ACTION . "/users/editCurrent" );

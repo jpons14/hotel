@@ -3,15 +3,18 @@
 
 use PHPMailer\PHPMailer\PHPMailer;
 
-class Bookings extends Controller {
-    public function __construct( $private ) {
-        parent::__construct( $private );
+class Bookings extends Controller
+{
+    public function __construct($private)
+    {
+        parent::__construct($private);
     }
 
 
-    public function showForms() {
+    public function showForms()
+    {
         $this->menu();
-        new View( [ 'header', 'bookingForm' ] );
+        new View(['header', 'bookingForm']);
     }
 
     /**
@@ -19,11 +22,12 @@ class Bookings extends Controller {
      * Get All bookings
      * Get
      */
-    public function checkAvailableRooms() {
+    public function checkAvailableRooms()
+    {
         $this->menu();
-        new View( [ 'showDates' ], [
-                'startDate' => $_POST[ 'start_date' ],
-                'endDate' => $_POST[ 'end_date' ]
+        new View(['showDates'], [
+                'startDate' => $_POST['start_date'],
+                'endDate' => $_POST['end_date']
             ]
         );
 
@@ -39,22 +43,22 @@ class Bookings extends Controller {
         $resultAllRoomTypes = [];
 
         # Loop through all the room types
-        foreach( $allRoomTypes as $key => $item ) {
+        foreach ($allRoomTypes as $key => $item) {
             $rooms = new Room();
-            $roomsList = $rooms->whereFkRoomTypesIdNameId( $item[ 0 ] );
+            $roomsList = $rooms->whereFkRoomTypesIdNameId($item[0]);
 
-            foreach( $roomsList as $roomArray ) {
+            foreach ($roomsList as $roomArray) {
                 $tmpRoom = new Room();
-                $tmpRoom->setData( $roomArray );
-                if( $tmpRoom->booked == '1' ) {
+                $tmpRoom->setData($roomArray);
+                if ($tmpRoom->booked == '1') {
                     // Check availability of this room
-                    $bookingsByRoomId = $booking->getBookingsByRoomId( $tmpRoom->id );
-                    foreach( $bookingsByRoomId as $value ) {
-                        $boolean = $booking->isBetweenDates( $value->start_date, $_POST[ 'start_date' ], $_POST[ 'end_date' ] );
-                        $boolean2 = $booking->isBetweenDates( $value->end_date, $_POST[ 'start_date' ], $_POST[ 'end_date' ] );
-                        if( !$boolean && !$boolean2 ) {
+                    $bookingsByRoomId = $booking->getBookingsByRoomId($tmpRoom->id);
+                    foreach ($bookingsByRoomId as $value) {
+                        $boolean = $booking->isBetweenDates($value->start_date, $_POST['start_date'], $_POST['end_date']);
+                        $boolean2 = $booking->isBetweenDates($value->end_date, $_POST['start_date'], $_POST['end_date']);
+                        if (!$boolean && !$boolean2) {
                             # If i set this key will not be repeated the values
-                            $resultAllRoomTypes[ $item[ 1 ] ] = $item;
+                            $resultAllRoomTypes[$item[1]] = $item;
                         }
 
                     }
@@ -65,42 +69,43 @@ class Bookings extends Controller {
 
             // If the room types don't have any room available take it out of the array
             $counter = 0;
-            foreach( $roomsList as $room ) {
-                if( $item[ 1 ] == $room[ 6 ] ) {
-                    if( $room[ 6 ] )
+            foreach ($roomsList as $room) {
+                if ($item[1] == $room[6]) {
+                    if ($room[6])
                         $counter++;
                 }
             }
-            if( $counter == 0 )
-                unset( $allRoomTypes[ $key ] );
+            if ($counter == 0)
+                unset($allRoomTypes[$key]);
         }
-        echo '<pre>$resultAllRoomTypes' . print_r( $resultAllRoomTypes, true ) . '</pre>';
-        new View( [ 'roomTypesListJavascript' ], [], [ 'roomsTypesListWidget' => [
+        echo '<pre>$resultAllRoomTypes' . print_r($resultAllRoomTypes, true) . '</pre>';
+        new View(['roomTypesListJavascript'], [], ['roomsTypesListWidget' => [
             'data' => $resultAllRoomTypes
-        ] ] );
+        ]]);
 
     }
 
-    public function sendMails() {
-        $hashDni = hash( 'ripemd160', $_POST[ 'dni' ] );
+    public function sendMails()
+    {
+        $hashDni = hash('ripemd160', $_POST['dni']);
         $booking = new Booking();
-        $bookingID = $booking->insertAndGetInsertedId( [
-            'start_date' => $_GET[ 'start_date' ],
-            'end_date' => $_GET[ 'end_date' ],
+        $bookingID = $booking->insertAndGetInsertedId([
+            'start_date' => $_GET['start_date'],
+            'end_date' => $_GET['end_date'],
             'confirmed' => '0',
             'paid' => '0',
             'pay_method' => 'visa',
             'adults_number' => 2,
             'children_number' => 0,
-            'fk_users_dni_dni' => $_POST[ 'dni' ],
+            'fk_users_dni_dni' => $_POST['dni'],
             'fk_rooms_id_name' => 1,
-            'room_type' => $_GET[ 'room_type_id' ]
-        ] );
+            'room_type' => $_GET['room_type_id']
+        ]);
 
         //        $b = $booking->allByUser2($_POST['dni']);
-        $this->session->setVar( 'bid', $bookingID );
+        $this->session->setVar('bid', $bookingID);
 
-        $mail = new PHPmailer( true );
+        $mail = new PHPmailer(true);
         try {
             $mail->SMTPDebug = 2;                                 // Enable verbose debug output
             $mail->isSMTP();                                      // Set mailer to use SMTP
@@ -114,236 +119,248 @@ class Bookings extends Controller {
             $mail->CharSet = "UTF-8";                          // TCP port to connect to
 
             //Recipients
-            $mail->setFrom( 'daw2jponspons@iesjoanramis.org', 'Josep' );
-            $mail->addAddress( $_POST[ 'email' ], 'Joe User' );     // Add a recipient
+            $mail->setFrom('daw2jponspons@iesjoanramis.org', 'Josep');
+            $mail->addAddress($_POST['email'], 'Joe User');     // Add a recipient
 
-            $mail->isHTML( true );                                  // Set email format to HTML
+            $mail->isHTML(true);                                  // Set email format to HTML
             $mail->Subject = 'Here is the subject';
             $mail->Body = "Hello <a href='http://hotel.dev/bookings/confirmBookingDNIForm?dni=$hashDni&bid={$bookingID}'>Confirm</a>";
             $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
 
             $mail->send();
             echo 'Message has been sent';
-        } catch( Exception $e ) {
+        } catch (Exception $e) {
             echo 'Message could not be sent.';
             echo 'Mailer Error: ' . $mail->ErrorInfo;
         }
         //        $user = new User($_POST['email'], '', $_POST['dni'], true);
 
-        header( 'Location: ' . FORM_ACTION . '/' );
+        header('Location: ' . FORM_ACTION . '/');
     }
 
-    public function confirmBookingDNIForm() {
+    public function confirmBookingDNIForm()
+    {
         $this->menu();
-        $bid = $this->session->getVar( 'bid' );
-        echo '<pre>$bid' . print_r( $bid, true ) . '</pre>';
+        $bid = $this->session->getVar('bid');
+        echo '<pre>$bid' . print_r($bid, true) . '</pre>';
 
-        new View( [ 'confirmBookingDNIForm' ], [ 'dni' => $_GET[ 'dni' ], 'bid' => $_GET[ 'bid' ] ] );
+        new View(['confirmBookingDNIForm'], ['dni' => $_GET['dni'], 'bid' => $_GET['bid']]);
     }
 
-    public function confirmBookingDNI() {
+    public function confirmBookingDNI()
+    {
         $this->menu();
-        if( hash( 'ripemd160', $_POST[ 'dni' ] ) == $_GET[ 'dni' ] ) {
+        if (hash('ripemd160', $_POST['dni']) == $_GET['dni']) {
             $booking = new Booking();
-            $booking->update( [ 'confirmed' => '1' ], $_GET[ 'bid' ] );
-            new VIew( [ 'confirmed' ], [ 'message' => 'PERFECT Booking confirmed' ] );
+            $booking->update(['confirmed' => '1'], $_GET['bid']);
+            new VIew(['confirmed'], ['message' => 'PERFECT Booking confirmed']);
         } else {
-            new VIew( [ 'confirmed' ], [ 'message' => 'ERROR the DNI introduced is not correct' ] );
+            new VIew(['confirmed'], ['message' => 'ERROR the DNI introduced is not correct']);
         }
     }
 
-    public function confirmBooking() {
+    public function confirmBooking()
+    {
         $this->menu();
         $roomType = new RoomType();
-        $roomTypes = $roomType->getById( $_GET[ 'room_type_id' ] );
+        $roomTypes = $roomType->getById($_GET['room_type_id']);
 
-        $days = strtotime( $_GET[ 'end_date' ] ) - strtotime( $_GET[ 'start_date' ] );
+        $days = strtotime($_GET['end_date']) - strtotime($_GET['start_date']);
         $numberDays = $days / 86400;
 
-        new View( [ 'confirmBooking' ], [
-            'startDate' => $_GET[ 'start_date' ],
-            'endDate' => $_GET[ 'end_date' ],
-            'roomType' => $roomTypes[ 0 ][ 1 ],
-            'price' => $numberDays * $roomTypes[ 0 ][ 2 ],
-        ] );
+        new View(['confirmBooking'], [
+            'startDate' => $_GET['start_date'],
+            'endDate' => $_GET['end_date'],
+            'roomType' => $roomTypes[0][1],
+            'price' => $numberDays * $roomTypes[0][2],
+        ]);
 
     }
 
-    public function loginByDNIForm() {
+    public function loginByDNIForm()
+    {
         $this->menu();
-        new View( [ 'loginByDNIForm' ] );
+        new View(['loginByDNIForm']);
     }
 
-    public function loginByDNI() {
+    public function loginByDNI()
+    {
         $this->menu();
         $booking = new Booking();
-        $bookings = $booking->where( 'fk_users_dni_dni', $_POST[ 'dni' ] );
-        echo '<pre>$bookings[0]' . print_r( $bookings, true ) . '</pre>';
+        $bookings = $booking->where('fk_users_dni_dni', $_POST['dni']);
+        echo '<pre>$bookings[0]' . print_r($bookings, true) . '</pre>';
         //        new View( [], [], [ 'TableWidget' => [
         //            'id' => $bookings->id
         //        ] ] );
     }
 
-    public function index() {
+    public function index()
+    {
         $booking = new Booking();
         $booking->getAllBookings();
-        $elements = $booking->getAllBookings( [ 'id', 'fk_users_dni_dni', 'start_date', 'end_date' ] );
+        $elements = $booking->getAllBookings(['id', 'fk_users_dni_dni', 'start_date', 'end_date']);
 
-        foreach( $elements as $index => $element ) {
-            if( $returneds[ $index ][ 0 ] == 1 ) {
-                $elements[ $index ][ 2 ] = '<div class="alert alert-success"> ' . $elements[ $index ][ 2 ] . '</div>';
+        foreach ($elements as $index => $element) {
+            if ($returneds[$index][0] == 1) {
+                $elements[$index][2] = '<div class="alert alert-success"> ' . $elements[$index][2] . '</div>';
             }
             // if it's in the return day -> orange, if its late -> red
-            if( strtotime( date( 'm/d/Y' ) ) == strtotime( $element[ 4 ] ) ) {
-                $elements[ $index ][ 4 ] = '<div class="alert alert-warning">' . $element[ 4 ] . '</div>';
-            } elseif( strtotime( date( 'm/d/Y' ) ) > strtotime( $element[ 4 ] ) ) {
-                $elements[ $index ][ 4 ] = '<div class="alert alert-danger">' . $element[ 4 ] . '</div>';
+            if (strtotime(date('m/d/Y')) == strtotime($element[4])) {
+                $elements[$index][4] = '<div class="alert alert-warning">' . $element[4] . '</div>';
+            } elseif (strtotime(date('m/d/Y')) > strtotime($element[4])) {
+                $elements[$index][4] = '<div class="alert alert-danger">' . $element[4] . '</div>';
             }
 
         }
 
 
-        $user = new User( $this->session->getVar( 'userEmail' ) );
-        $users = $user->getAllUsers( [ 'email' ] );
+        $user = new User($this->session->getVar('userEmail'));
+        $users = $user->getAllUsers(['email']);
 
 
-        new View( [ 'header' ] );
-        new View( [], [], [ 'MenuWidget' => [
-            'userType' => $this->session->getVar( 'userType' )
-        ] ] );
+        new View(['header']);
+        new View([], [], ['MenuWidget' => [
+            'userType' => $this->session->getVar('userType')
+        ]]);
 
-        new View( [ 'bookingsSearch' ] );
+        new View(['bookingsSearch']);
 
-        new View( [], [], [ 'TableWidget' => [
-            'fields' => [ 'id', 'User Email', 'Book Name', 'Pick Up', 'Pick Off', 'Return' ],
+        new View([], [], ['TableWidget' => [
+            'fields' => ['id', 'User Email', 'Book Name', 'Pick Up', 'Pick Off', 'Return'],
             'values' => $elements,
             'editable' => true,
             'editURI' => '/bookings/return?id=',
             'editNum' => 0
-        ] ] );
+        ]]);
     }
 
-    public function return() {
+    public function return()
+    {
         $booking = new Booking();
-        if( isset( $_GET[ 'id' ] ) ) {
-            $booking->return( $_GET[ 'id' ] );
+        if (isset($_GET['id'])) {
+            $booking->return($_GET['id']);
         }
 
-        header( 'Location: ' . FORM_ACTION . '/bookings/index' );
+        header('Location: ' . FORM_ACTION . '/bookings/index');
 
     }
 
-    public function booking() {
-        $pickUp = $_POST[ 'pickUp' ];
+    public function booking()
+    {
+        $pickUp = $_POST['pickUp'];
 
         $toSum = '';
 
         $book = new Book();
-        $conservation = $book->getConservationById( $_GET[ 'bookId' ] );
+        $conservation = $book->getConservationById($_GET['bookId']);
 
         $paramethers = new BookParamether();
 
 
-        if( $conservation == 'old' ) {
+        if ($conservation == 'old') {
             $toSum = "+{$paramethers->old}days";
-        } elseif( $conservation == 'normal' ) {
+        } elseif ($conservation == 'normal') {
             $toSum = "+{$paramethers->normal}days";
         } else {
             $toSum = "+{$paramethers->new}days";
         }
 
-        $pickOff = date( 'm/d/Y', strtotime( $pickUp . $toSum ) );
+        $pickOff = date('m/d/Y', strtotime($pickUp . $toSum));
         $elements = [
-            'pick_up' => $_POST[ 'pickUp' ],
+            'pick_up' => $_POST['pickUp'],
             'pick_off' => $pickOff,
-            'user_email' => $this->session->getVar( 'userEmail' ),
-            'book_id' => $_GET[ 'bookId' ]
+            'user_email' => $this->session->getVar('userEmail'),
+            'book_id' => $_GET['bookId']
         ];
         $booking = new Booking();
-        $booking->newBooking( $elements );
-        header( 'Location: ' . FORM_ACTION . '/books/details?id=' . $_GET[ 'bookId' ] );
+        $booking->newBooking($elements);
+        header('Location: ' . FORM_ACTION . '/books/details?id=' . $_GET['bookId']);
     }
 
-    public function by() {
-        new View( [ 'header' ] );
-        new View( [], [], [ 'MenuWidget' => [
-            'userType' => $this->session->getVar( 'userType' )
-        ] ] );
+    public function by()
+    {
+        new View(['header']);
+        new View([], [], ['MenuWidget' => [
+            'userType' => $this->session->getVar('userType')
+        ]]);
 
         $tp = [];
 
-        switch( $_POST[ 'what' ] ) {
+        switch ($_POST['what']) {
             case 'userEmail':
-                $tp = $this->byUserEmail( $_POST[ 'text' ] );
+                $tp = $this->byUserEmail($_POST['text']);
                 break;
             case 'bookId':
-                $tp = $this->byBookId( $_POST[ 'text' ] );
+                $tp = $this->byBookId($_POST['text']);
                 break;
             case 'notReturned':
-                $tp = $this->byNotReturned( 'past' );
+                $tp = $this->byNotReturned('past');
                 break;
             case 'todayReturn':
-                $tp = $this->byNotReturned( 'today' );
+                $tp = $this->byNotReturned('today');
                 break;
             default:
-                if( !isset( $_POST[ 'text' ] ) ) {
-                    $_POST[ 'text' ] = $_GET[ 'text' ];
+                if (!isset($_POST['text'])) {
+                    $_POST['text'] = $_GET['text'];
                 }
-                $tp = $this->byBookId( $_POST[ 'text' ] );
+                $tp = $this->byBookId($_POST['text']);
                 break;
         }
 
-        new View( [ 'bookingsSearch' ], [], [ 'TableWidget' => [
-            'fields' => [ 'id', 'User Email', 'Book Name', 'Pick Up', 'Pick Off', 'Return' ],
+        new View(['bookingsSearch'], [], ['TableWidget' => [
+            'fields' => ['id', 'User Email', 'Book Name', 'Pick Up', 'Pick Off', 'Return'],
             'values' => $tp,
             'editable' => true,
             'editURI' => '/bookings/return?id=',
             'editNum' => 0
-        ] ] );
+        ]]);
 
     }
 
-    public function byUserEmail( $text ) {
+    public function byUserEmail($text)
+    {
         $booking = new Booking();
-        $bookings = $booking->byEmail( $text );
+        $bookings = $booking->byEmail($text);
 
         return $bookings;
     }
 
-    public function byBookId( $text = '' ) {
-        if( $text == '' ) {
-            if( !isset( $_POST[ 'text' ] ) ) {
-                $_POST[ 'text' ] = $_GET[ 'text' ];
+    public function byBookId($text = '')
+    {
+        if ($text == '') {
+            if (!isset($_POST['text'])) {
+                $_POST['text'] = $_GET['text'];
             }
-            $text = $_POST[ 'text' ];
+            $text = $_POST['text'];
 
             $booking = new Booking();
-            $bookings = $booking->byBookId( $text );
+            $bookings = $booking->byBookId($text);
 
             return $bookings;
         } else {
             $booking = new Booking();
-            $bookings = $booking->byBookId( $text );
+            $bookings = $booking->byBookId($text);
 
             return $bookings;
         }
     }
 
     // need to search by e-mail too
-    public function byNotReturned( $pastOrToday = 'past' ) {
+    public function byNotReturned($pastOrToday = 'past')
+    {
         $b = new Booking();
         $bookings = $b->getAllBookings();
 
         $return = [];
 
 
-        foreach( $bookings as $index => $booking ) {
-            if( $pastOrToday == 'past' ) {
-                if( strtotime( date( 'm/d/Y' ) ) > strtotime( $booking[ 4 ] ) ) {
+        foreach ($bookings as $index => $booking) {
+            if ($pastOrToday == 'past') {
+                if (strtotime(date('m/d/Y')) > strtotime($booking[4])) {
                     $return[] = $booking;
                 }
-            } elseif( $pastOrToday == 'today' ) {
-                if( strtotime( date( 'm/d/Y' ) ) == strtotime( $booking[ 4 ] ) ) {
+            } elseif ($pastOrToday == 'today') {
+                if (strtotime(date('m/d/Y')) == strtotime($booking[4])) {
                     $return[] = $booking;
                 }
             }
@@ -353,75 +370,112 @@ class Bookings extends Controller {
     }
 
 
-    public function currentUser() {
+    public function currentUser()
+    {
         $booking = new Booking();
-        $history = $booking->bookingsWhere('fk_users_dni_dni', $this->session->getVar( 'userDNI' ) );
+        $history = $booking->bookingsWhere('fk_users_dni_dni', $this->session->getVar('userDNI'), ['id', 'start_date', 'end_date', 'confirmed']);
 
-//        echo '<pre>$history' . print_r( $history, true ) . '</pre>';
+        new View(['header'], [], ['MenuWidget' => [
+            'userType' => $this->session->getVar('userType')
+        ]]);
 
-//        foreach( $history as $index => $item ) {
-//            if( strtotime( date( 'm/d/Y' ) ) == strtotime( $item[ 4 ] ) ) {
-//                $history[ $index ][ 4 ] = '<div class="alert alert-warning">' . $item[ 4 ] . '</div>';
-//            } elseif( strtotime( date( 'm/d/Y' ) ) > strtotime( $item[ 4 ] ) ) {
-//                $history[ $index ][ 4 ] = '<div class="alert alert-danger">' . $item[ 4 ] . '</div>';
-//            }
-//        }
-
-        echo '<pre>$history[0]->toArray()' . print_r( $history[0]->toArray(), true ) . '</pre>';
-
-        new View( [ 'header' ], [], [ 'MenuWidget' => [
-            'userType' => $this->session->getVar( 'userType' )
-        ] ] );
-
-        new View( [ 'bookingsSearchOnlyID' ], [], [ 'TableWidget' => [
-            'fields' => [ 'id', 'Start Date', 'End Date', 'Confirmed', 'Pay method', 'Paid?', 'Adults Num', 'Children Num', 'DNI', 'Room ID', 'Room Type ID' ],
-            'values' => $history
-        ] ] );
+        new View(['bookingsSearchOnlyID'], [], ['TableWidget' => [
+            'fields' => ['id', 'Start Date', 'End Date', 'Confirmed', 'Edit', 'Delete'],
+            'values' => $history,
+            'editable' => true,
+            'editURI' => '/bookings/edit?id=',
+            'editNum' => 0,
+            'deletable' => true,
+            'deleteURI' => '/bookings/destroy?id=',
+            'deleteNum' => 0
+        ]]);
     }
 
-    public function toOtherUser() {
-        new View( [ 'header' ] );
-        new View( [], [], [ 'MenuWidget' => [
-            'userType' => $this->session->getVar( 'userType' )
-        ] ] );
+    public function edit()
+    {
 
-        new View( [ 'toOtherUserBooking' ] );
+        $this->menu();
+        $booking = new Booking();
+        $currentBooking = $booking->getBookingById($_GET['id']);
+        $history = $booking->bookingsWhere('fk_users_dni_dni', $this->session->getVar('userDNI'), ['id']);
+
+        $array = [];
+
+        foreach ($history as $item) {
+            $array[] = $item[0];
+        }
+
+        if (!in_array($_GET['id'], $array))
+            throw new Exception('You aren\'t the owner of this booking', 403);
+
+        new View(['editBooking'], [
+            'id' => $_GET['id'] ?? '',
+            'start_date' => $currentBooking->start_date,
+            'end_date' => $currentBooking->end_date,
+        ]);
+    }
+
+    public function update()
+    {
+        $bookings = new Booking();
+        $bookings->update(['start_date' => $_POST['start_date'], 'end_date' => $_POST['end_date']], $_GET['id']);
+        header('Location: ' . FORM_ACTION . '/bookings/currentUser');
+    }
+
+    public function destroy()
+    {
+        $booking = new Booking();
+        if (!empty($_GET['id'])) {
+            $booking->destroy((int)$_GET['id']);
+        }
+        header('Location: ' . FORM_ACTION . '/bookings/currentUser');
+    }
+
+    public function toOtherUser()
+    {
+        new View(['header']);
+        new View([], [], ['MenuWidget' => [
+            'userType' => $this->session->getVar('userType')
+        ]]);
+
+        new View(['toOtherUserBooking']);
 
     }
 
-    public function bookToOther() {
-        echo '<pre>$_POST' . print_r( $_POST, true ) . '</pre>';
+    public function bookToOther()
+    {
+        echo '<pre>$_POST' . print_r($_POST, true) . '</pre>';
 
 
-        $pickUp = $_POST[ 'pickUp' ];
+        $pickUp = $_POST['pickUp'];
 
         $toSum = '';
 
         $book = new Book();
-        $conservation = $book->getConservationById( $_POST[ 'bookId' ] );
+        $conservation = $book->getConservationById($_POST['bookId']);
 
         $paramethers = new BookParamether();
 
 
-        if( $conservation == 'old' ) {
+        if ($conservation == 'old') {
             $toSum = "+{$paramethers->old}days";
-        } elseif( $conservation == 'normal' ) {
+        } elseif ($conservation == 'normal') {
             $toSum = "+{$paramethers->normal}days";
         } else {
             $toSum = "+{$paramethers->new}days";
         }
 
 
-        $pickOff = date( 'm/d/Y', strtotime( $pickUp . $toSum ) );
+        $pickOff = date('m/d/Y', strtotime($pickUp . $toSum));
         $elements = [
-            'pick_up' => $_POST[ 'pickUp' ],
+            'pick_up' => $_POST['pickUp'],
             'pick_off' => $pickOff,
-            'user_email' => $_POST[ 'userEmail' ],
-            'book_id' => $_POST[ 'bookId' ]
+            'user_email' => $_POST['userEmail'],
+            'book_id' => $_POST['bookId']
         ];
         $booking = new Booking();
-        $booking->newBooking( $elements );
-        header( 'Location: ' . FORM_ACTION . '/bookings/toOtherUser' );
+        $booking->newBooking($elements);
+        header('Location: ' . FORM_ACTION . '/bookings/toOtherUser');
     }
 
 }

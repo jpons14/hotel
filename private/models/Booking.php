@@ -18,7 +18,8 @@ class Booking extends DB {
         'fields',
         'timestamps',
         'hasId',
-        'hidden'
+        'hidden',
+        'ta'
     ];
 
     /**
@@ -41,8 +42,8 @@ class Booking extends DB {
         $this->setTable( 'bookings' );
 
         try {
-            $this->setFields( [ 'id', 'start_date', 'end_date', 'confirmed', 'pay_method', 'paid', 'adults_number', 'children_number', 'fk_users_dni_dni', 'fk_rooms_id_name', 'room_type'] );
-        } catch(VarNoInitializedException $e){
+            $this->setFields( [ 'id', 'start_date', 'end_date', 'confirmed', 'pay_method', 'paid', 'adults_number', 'children_number', 'fk_users_dni_dni', 'fk_rooms_id_name', 'room_type' ] );
+        } catch( VarNoInitializedException $e ) {
             $e->showException();
         }
 
@@ -55,27 +56,37 @@ class Booking extends DB {
     public function __set( $key, $data ) {
         $this->$key = $data;
     }
+
     /**
      * @param $id
+     * @param array $fields
      * @return Booking $this
      */
-    public function getBookingById( $id ) {
-        if(is_int($id))
+    public function getBookingById( $id, $fields = [] ) {
+        if( is_int( $id ) )
             $id = $id . '';
 
-        $data = $this->where('id', $id);
-        $this->setData($data);
+        $data = $this->where( 'id', $id, $fields );
+        $this->setData( $data );
+
         return $this;
     }
 
-    public function bookingsWhere($field2Search, $value2Search ) {
-        $where = $this->where($field2Search, $value2Search);
-        return $this->setData2($where);
+    public function bookingsWhere( $field2Search, $value2Search, $fields = [] ) {
+        $where = $this->where( $field2Search, $value2Search, $fields );
+        //        return $this->setData2($where);
+
+        if( $fields == [] ) {
+            return $this->setData3( $where );
+        } else {
+            return $where;
+        }
     }
 
     public function getAllBookings( $elements = [] ) {
-        if(empty($elements) || $elements == [])
+        if( empty( $elements ) || $elements == [] )
             $elements = $this->fields;
+
         return $this->select( $elements );
     }
 
@@ -84,9 +95,11 @@ class Booking extends DB {
     }
 
     public function allByUser2( $userDni ) {
-        $this->setData( $this->whereOrderBy( 'fk_users_dni_dni', $userDni, 'DESC' )[0]);
+        $this->setData( $this->whereOrderBy( 'fk_users_dni_dni', $userDni, 'DESC' )[ 0 ] );
+
         return $this;
     }
+
     public function newBooking( array $elements ) {
         try {
             if( $this->isBooked( $elements ) ) {
@@ -158,11 +171,11 @@ class Booking extends DB {
     }
 
     public function getBookingsByRoomId( $id ) {
-        if (is_int($id))
+        if( is_int( $id ) )
             $id = '' . $id;
-        $where = $this->where('fk_rooms_id_name', $id);
+        $where = $this->where( 'fk_rooms_id_name', $id );
 
-        $thisArray = $this->setData2($where);
+        $thisArray = $this->setData2( $where );
 
         return $thisArray;
     }
@@ -187,17 +200,17 @@ class Booking extends DB {
      * @param $data
      */
     private function setData( $data ) {
-        $this->id = $data[0][0];
-        $this->start_date = $data[0][1];
-        $this->end_date = $data[0][2];
-        $this->confirmed = $data[0][3];
-        $this->pay_method = $data[0][4];
-        $this->paid = $data[0][5];
-        $this->adults_number = $data[0][6];
-        $this->children_number = $data[0][7];
-        $this->room_type = $data[0][8];
-        $this->fk_users_dni = $data[0][9];
-        $this->room_name = $data[0][10];
+        $this->id = $data[ 0 ][ 0 ];
+        $this->start_date = $data[ 0 ][ 1 ];
+        $this->end_date = $data[ 0 ][ 2 ];
+        $this->confirmed = $data[ 0 ][ 3 ];
+        $this->pay_method = $data[ 0 ][ 4 ];
+        $this->paid = $data[ 0 ][ 5 ];
+        $this->adults_number = $data[ 0 ][ 6 ];
+        $this->children_number = $data[ 0 ][ 7 ];
+        $this->room_type = $data[ 0 ][ 8 ];
+        $this->fk_users_dni = $data[ 0 ][ 9 ];
+        $this->room_name = $data[ 0 ][ 10 ];
     }
 
 
@@ -210,32 +223,55 @@ class Booking extends DB {
         $thisArray = [];
         foreach( $data as $datum ) {
             $thisTmp = new Booking();
-            $thisTmp->id = $datum[0];
-            $thisTmp->start_date = $datum[1];
-            $thisTmp->end_date = $datum[2];
-            $thisTmp->confirmed = $datum[3];
-            $thisTmp->pay_method = $datum[4];
-            $thisTmp->paid = $datum[5];
-            $thisTmp->adults_number = $datum[6];
-            $thisTmp->children_number = $datum[7];
-            $thisTmp->room_type = $datum[10];
-            $thisTmp->fk_users_dni = $datum[8];
-            $thisTmp->room_name = $datum[12];
+            $thisTmp->id = $datum[ 0 ];
+            $thisTmp->start_date = $datum[ 1 ];
+            $thisTmp->end_date = $datum[ 2 ];
+            $thisTmp->confirmed = $datum[ 3 ];
+            $thisTmp->pay_method = $datum[ 4 ];
+            $thisTmp->paid = $datum[ 5 ];
+            $thisTmp->adults_number = $datum[ 6 ];
+            $thisTmp->children_number = $datum[ 7 ];
+            $thisTmp->room_type = $datum[ 10 ];
+            $thisTmp->fk_users_dni = $datum[ 8 ];
+            $thisTmp->room_name = $datum[ 12 ];
             $thisArray[] = $thisTmp;
         }
+
         return $thisArray;
+    }
+
+    public function setData3( $data ) {
+
+        $collection = new Collection();
+        foreach( $data as $datum ) {
+            $thisTmp = new Booking();
+            $thisTmp->id = $datum[ 0 ];
+            $thisTmp->start_date = $datum[ 1 ];
+            $thisTmp->end_date = $datum[ 2 ];
+            $thisTmp->confirmed = $datum[ 3 ];
+            $thisTmp->pay_method = $datum[ 4 ];
+            $thisTmp->paid = $datum[ 5 ];
+            $thisTmp->adults_number = $datum[ 6 ];
+            $thisTmp->children_number = $datum[ 7 ];
+            $thisTmp->room_type = $datum[ 10 ];
+            $thisTmp->fk_users_dni = $datum[ 8 ];
+            $thisTmp->room_name = $datum[ 12 ];
+            $collection->addItem( $thisTmp );
+        }
+
+        return $collection;
     }
 
     /**
      * TODO: Put this method in the parent class
      * @return array
      */
-    public function toArray(  ) {
-        $attributes = get_object_vars($this);
+    public function toArray() {
+        $attributes = get_object_vars( $this );
         $array = array();
         foreach( $attributes as $index => $attribute ) {
-            if(!in_array($index, $this->hidden))
-                $array[$index] = $attribute;
+            if( !in_array( $index, $this->hidden ) )
+                $array[ $index ] = $attribute;
         }
 
         return $array;

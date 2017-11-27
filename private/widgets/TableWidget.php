@@ -10,7 +10,7 @@ class TableWidget extends FatherWidget
     public function editable( &$return, $value  ) {
         if($this->vars['editable']) {
             // delete icon
-            $return .= '<td><a href="' . FORM_ACTION . $this->vars['editURI'] . $value[ $this->vars['editNum'] ] . '" ><i class="fa fa-pencil" aria-hidden="true"></i></a></td>';
+            $return .= '<td><a href="' . FORM_ACTION . $this->vars['editURI'] . ($value[ $this->vars['editNum'] ] ?? 0) . '" ><i class="fa fa-pencil" aria-hidden="true"></i></a></td>';
 
         }
     }
@@ -18,7 +18,7 @@ class TableWidget extends FatherWidget
     public function deletable( &$return, $value ) {
         if($this->vars['deletable']) {
             // edit icon
-            $return .= '<td><a href="' . FORM_ACTION . $this->vars['deleteURI'] . $value[ 2 ] . '"><i class="fa fa-times" aria-hidden="true"></i></a></td>';
+            $return .= '<td><a href="' . FORM_ACTION . $this->vars['deleteURI'] . ($value[ $this->vars['deleteNum']] ?? 0) . '"><i class="fa fa-times" aria-hidden="true"></i></a></td>';
         }
     }
 

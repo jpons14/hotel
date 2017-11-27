@@ -10,18 +10,18 @@ class UserEditProfile extends FatherWidget {
         $type = $this->vars[ 'userType' ];
 
         $member = '';
-        $librarian = '';
+        $hotelier = '';
         $root = '';
 
         ## todo: ask
         if( $type == 'member' )
             $member = 'selected';
-        if( $type == 'librarian' )
-            $librarian = 'selected';
+        if( $type == 'hotelier' )
+            $hotelier = 'selected';
         if( $type == 'root' )
             $root = 'selected';
 
-        $string = '<div class="container">
+        $string = '<br /><div class="container">
             <form action="' . $GLOBALS[ 'formAction' ] . '/users/update?email=' . $this->vars[ 'userEmail' ] . '" method="POST">
                 <div class="form-group">
                     <input class="form-control" type="text" placeholder="Name" name="name" value="' . $this->vars[ 'userName' ] . '"/>
@@ -29,9 +29,9 @@ class UserEditProfile extends FatherWidget {
                 <div class="form-group">
                 <label for="userType"></label>
                     <select class="form-control" name="userType" id="userType">
-                        <option ' . $member . ' value="member">member</option>
-                        <option ' . $librarian . ' value="librarian">librarian</option>
-                        <option ' . $root . ' value="root">root</option>
+                        <option ' . $member . ' value="member">Member</option>
+                        <option ' . $hotelier . ' value="hotelier">Hotelier</option>
+                        <option ' . $root . ' value="root">Root</option>
                     </select>
                 </div>
                 <div class="form-group">
