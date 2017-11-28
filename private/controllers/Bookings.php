@@ -225,7 +225,7 @@ class Bookings extends Controller
 
         new View(['bookingsSearch']);
 
-        new View([], [], ['TableWidget' => [
+            new View([], [], ['TableWidget' => [
             'fields' => ['id', 'User Email', 'Book Name', 'Pick Up', 'Pick Off', 'Return'],
             'values' => $elements,
             'editable' => true,
@@ -396,7 +396,7 @@ class Bookings extends Controller
 
         $this->menu();
         $booking = new Booking();
-        $currentBooking = $booking->getBookingById($_GET['id']);
+        $currentBooking = $booking->getBookingById($_GET['id'], ['start_date', 'end_date', 'room_type']);
         $history = $booking->bookingsWhere('fk_users_dni_dni', $this->session->getVar('userDNI'), ['id']);
 
         $array = [];
@@ -408,10 +408,11 @@ class Bookings extends Controller
         if (!in_array($_GET['id'], $array))
             throw new Exception('You aren\'t the owner of this booking', 403);
 
-        new View(['editBooking'], [
+        new View(['editBooking', 'editBookingJS'], [
             'id' => $_GET['id'] ?? '',
-            'start_date' => $currentBooking->start_date,
-            'end_date' => $currentBooking->end_date,
+            'start_date' => $currentBooking[0],
+            'end_date' => $currentBooking[1],
+            'roomType' => $currentBooking[2],
         ]);
     }
 

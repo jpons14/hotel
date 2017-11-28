@@ -60,16 +60,15 @@ class Booking extends DB {
     /**
      * @param $id
      * @param array $fields
-     * @return Booking $this
      */
     public function getBookingById( $id, $fields = [] ) {
         if( is_int( $id ) )
             $id = $id . '';
 
         $data = $this->where( 'id', $id, $fields );
-        $this->setData( $data );
-
-        return $this;
+//        $this->setData( $data );
+//        return $this;
+        return $data[0];
     }
 
     public function bookingsWhere( $field2Search, $value2Search, $fields = [] ) {

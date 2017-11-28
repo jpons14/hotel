@@ -59,6 +59,9 @@ foreach ( glob( __DIR__ . '/private/interfaces/*.php' ) as $item ) {
     require_once $item;
 }
 
+foreach ( glob( __DIR__ . '/private/traits/*.php' ) as $item ) {
+    require_once $item;
+}
 foreach ( glob( __DIR__ . '/private/controllers/*.php' ) as $item ) {
     require_once $item;
 }
@@ -74,5 +77,6 @@ foreach ( glob( __DIR__ . '/private/views/*.php' ) as $item ) {
 foreach ( glob( __DIR__ . '/private/exceptions/*.php' ) as $item ) {
     require_once $item;
 }
+
 
 $bootstrap = new Bootstrap();

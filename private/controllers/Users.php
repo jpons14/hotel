@@ -46,7 +46,7 @@ class Users extends Controller {
                     $params = implode( '&', $params );
                     header( "Location: " . FORM_ACTION . "{$ca}?{$params}" );
                 } else {
-                    header( "Location: " . FORM_ACTION . "/books/index" );
+                    header( "Location: " . FORM_ACTION . "/bookings/showForms" );
                 }
             }
             if( $user->getRegistered() ) {

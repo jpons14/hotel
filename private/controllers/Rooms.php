@@ -88,7 +88,6 @@ class Rooms extends Controller implements ResourceInterface {
         // The IDs of the values is the same order than in the DB
         $roomData = $room->getById( $_GET[ 'id' ] );
 
-        echo '<pre>$roomData' . print_r( $roomData, true ) . '</pre>';
 
         new View( [ 'roomEdit' ], [
             'id' => $roomData[ 0 ][ 0 ],

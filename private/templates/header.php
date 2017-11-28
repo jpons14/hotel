@@ -25,3 +25,6 @@
 
 <link rel="stylesheet" href="[[ formAction ]]/public/assets/css/style.css">
 <script src="[[ formAction ]]/public/assets/js/script.js"></script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.0/jquery-confirm.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.0/jquery-confirm.min.js"></script>

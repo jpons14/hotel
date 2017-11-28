@@ -50,6 +50,14 @@ return [
         'edit' => 200,
         'update' => 200
     ],
+    'RoomTypes' => [
+        'index' => 200,
+        'create' => 200,
+        'store' => 200,
+        'edit' => 200,
+        'update' => 200,
+        'destroy' => 200
+    ],
     'APIRoomsTypes' => [
         'index' => 100
     ]

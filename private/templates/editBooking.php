@@ -1,4 +1,11 @@
 <br />
+<div class="jumbotron jumbotron-fluid">
+    <div class="container">
+        <h1 class="display-3">Start Date: <span class="start_date">[[ start_date ]]</span></h1>
+        <h1 class="display-3">End Date: <span class="end_date">[[ end_date ]]</span></h1>
+        <h1 class="display-3">Price: <span class="price"></span></h1>
+    </div>
+</div>
 <div class="container">
     <form method="POST" action="[[ formAction ]]/bookings/update?id=[[ id ]]">
         <div class="form-group">

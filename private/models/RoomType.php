@@ -13,12 +13,12 @@ class RoomType extends DB{
         $this->setFields(['id', 'name', 'price']);
     }
 
-    public function getAll(  ) {
-        return $this->select();
+    public function getAll( $fields = [] ) {
+        return $this->select($fields);
     }
 
     public function getById( $id ) {
-        return $this->find($id);
+        return $this->find($id)[0];
     }
 
     public function __set( $name, $value ) {

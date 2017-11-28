@@ -1,0 +1,1 @@
+<script src="[[ formAction ]]/public/assets/js/confirm.js"></script>

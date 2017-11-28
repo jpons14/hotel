@@ -6,7 +6,9 @@ $(document).ready(function () {
        $(v).removeClass('active');
      }
   });
-  $('.datepicker').datepicker();
+  $('.datepicker').datepicker({
+      autoclose: true
+  });
 
   $('select').on('change', function () {
       $("form.by").submit();
