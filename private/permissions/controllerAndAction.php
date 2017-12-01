@@ -60,5 +60,9 @@ return [
     ],
     'APIRoomsTypes' => [
         'index' => 100
+    ],
+    'APIBookings' => [
+        'index' => 100,
+        'calculatePrice' => 100
     ]
 ];

@@ -89,18 +89,20 @@ class Bookings extends Controller
     {
         $hashDni = hash('ripemd160', $_POST['dni']);
         $booking = new Booking();
-        $bookingID = $booking->insertAndGetInsertedId([
-            'start_date' => $_GET['start_date'],
-            'end_date' => $_GET['end_date'],
-            'confirmed' => '0',
-            'paid' => '0',
-            'pay_method' => 'visa',
-            'adults_number' => 2,
-            'children_number' => 0,
-            'fk_users_dni_dni' => $_POST['dni'],
-            'fk_rooms_id_name' => 1,
-            'room_type' => $_GET['room_type_id']
-        ]);
+        try {
+            $bookingID = $booking->insertAndGetInsertedId([
+                'start_date' => $_GET['start_date'],
+                'end_date' => $_GET['end_date'],
+                'confirmed' => '0',
+                'paid' => '0',
+                'pay_method' => 'visa',
+                'adults_number' => 2,
+                'children_number' => 0,
+                'fk_users_dni_dni' => $_POST['dni'],
+                'fk_rooms_id_name' => 1,
+                'room_type' => $_GET['room_type_id']
+            ]);
+        } catch (DBException $e){}
 
         //        $b = $booking->allByUser2($_POST['dni']);
         $this->session->setVar('bid', $bookingID);
@@ -379,7 +381,7 @@ class Bookings extends Controller
             'userType' => $this->session->getVar('userType')
         ]]);
 
-        new View(['bookingsSearchOnlyID'], [], ['TableWidget' => [
+        new View(['bookingsSearchOnlyID', 'tmpPushJS'], [], ['TableWidget' => [
             'fields' => ['id', 'Start Date', 'End Date', 'Confirmed', 'Edit', 'Delete'],
             'values' => $history,
             'editable' => true,
@@ -391,6 +393,9 @@ class Bookings extends Controller
         ]]);
     }
 
+    /**
+     * @throws Exception
+     */
     public function edit()
     {
 
@@ -416,6 +421,9 @@ class Bookings extends Controller
         ]);
     }
 
+    /**
+     * @throws DBException
+     */
     public function update()
     {
         $bookings = new Booking();

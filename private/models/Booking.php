@@ -36,6 +36,7 @@ class Booking extends DB {
      * 10 => room_name
      * Booking constructor.
      * @param string $charset
+     * @throws DBException
      */
     public function __construct( $charset = 'UTF8' ) {
         parent::__construct( $charset );
@@ -60,17 +61,24 @@ class Booking extends DB {
     /**
      * @param $id
      * @param array $fields
+     * @return array
+     * @throws DBException
      */
     public function getBookingById( $id, $fields = [] ) {
         if( is_int( $id ) )
             $id = $id . '';
 
         $data = $this->where( 'id', $id, $fields );
-//        $this->setData( $data );
-//        return $this;
         return $data[0];
     }
 
+    /**
+     * @param $field2Search
+     * @param $value2Search
+     * @param array $fields
+     * @return array|Collection|null
+     * @throws DBException
+     */
     public function bookingsWhere( $field2Search, $value2Search, $fields = [] ) {
         $where = $this->where( $field2Search, $value2Search, $fields );
         //        return $this->setData2($where);
@@ -82,6 +90,11 @@ class Booking extends DB {
         }
     }
 
+    /**
+     * @param array $elements
+     * @return array|null
+     * @throws DBException
+     */
     public function getAllBookings( $elements = [] ) {
         if( empty( $elements ) || $elements == [] )
             $elements = $this->fields;
@@ -89,10 +102,20 @@ class Booking extends DB {
         return $this->select( $elements );
     }
 
+    /**
+     * @param $userDNI
+     * @return array|null
+     * @throws DBException
+     */
     public function allByUser( $userDNI ) {
         return $this->whereOrderBy( 'fk_users_dni_dni', $userDNI, 'DESC' );
     }
 
+    /**
+     * @param $userDni
+     * @return $this
+     * @throws DBException
+     */
     public function allByUser2( $userDni ) {
         $this->setData( $this->whereOrderBy( 'fk_users_dni_dni', $userDni, 'DESC' )[ 0 ] );
 
@@ -149,6 +172,11 @@ class Booking extends DB {
         }
     }
 
+    /**
+     * @param $email
+     * @return array|null
+     * @throws DBException
+     */
     public function byEmail( $email ) {
         ## TODO: refactor
         $all = $this->where( 'user_email', $email );
@@ -159,6 +187,11 @@ class Booking extends DB {
         return $all;
     }
 
+    /**
+     * @param $id
+     * @return array|null
+     * @throws DBException
+     */
     public function byBookId( $id ) {
         ## TODO: refactor
         $all = $this->where( 'book_id', $id );
@@ -169,6 +202,11 @@ class Booking extends DB {
         return $all;
     }
 
+    /**
+     * @param $id
+     * @return array
+     * @throws DBException
+     */
     public function getBookingsByRoomId( $id ) {
         if( is_int( $id ) )
             $id = '' . $id;
@@ -179,6 +217,11 @@ class Booking extends DB {
         return $thisArray;
     }
 
+    /**
+     * @param $id
+     * @return array
+     * @throws DBException
+     */
     public function return( $id ) {
         return $this->update( [ 'returned' => 1 ], $id );
     }
