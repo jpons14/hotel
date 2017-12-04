@@ -102,7 +102,8 @@ class Bookings extends Controller
                 'fk_rooms_id_name' => 1,
                 'room_type' => $_GET['room_type_id']
             ]);
-        } catch (DBException $e){}
+        } catch (DBException $e) {
+        }
 
         //        $b = $booking->allByUser2($_POST['dni']);
         $this->session->setVar('bid', $bookingID);
@@ -227,7 +228,7 @@ class Bookings extends Controller
 
         new View(['bookingsSearch']);
 
-            new View([], [], ['TableWidget' => [
+        new View([], [], ['TableWidget' => [
             'fields' => ['id', 'User Email', 'Book Name', 'Pick Up', 'Pick Off', 'Return'],
             'values' => $elements,
             'editable' => true,
@@ -374,23 +375,26 @@ class Bookings extends Controller
 
     public function currentUser()
     {
-        $booking = new Booking();
-        $history = $booking->bookingsWhere('fk_users_dni_dni', $this->session->getVar('userDNI'), ['id', 'start_date', 'end_date', 'confirmed']);
+        try {
+            $booking = new Booking();
+            $history = $booking->bookingsWhere('fk_users_dni_dni', $this->session->getVar('userDNI'), ['id', 'start_date', 'end_date', 'confirmed']);
 
-        new View(['header'], [], ['MenuWidget' => [
-            'userType' => $this->session->getVar('userType')
-        ]]);
+            new View(['header'], [], ['MenuWidget' => [
+                'userType' => $this->session->getVar('userType')
+            ]]);
 
-        new View(['bookingsSearchOnlyID', 'tmpPushJS'], [], ['TableWidget' => [
-            'fields' => ['id', 'Start Date', 'End Date', 'Confirmed', 'Edit', 'Delete'],
-            'values' => $history,
-            'editable' => true,
-            'editURI' => '/bookings/edit?id=',
-            'editNum' => 0,
-            'deletable' => true,
-            'deleteURI' => '/bookings/destroy?id=',
-            'deleteNum' => 0
-        ]]);
+            new View(['bookingsSearchOnlyID', 'tmpPushJS'], [], ['TableWidget' => [
+                'fields' => ['id', 'Start Date', 'End Date', 'Confirmed', 'Edit', 'Delete'],
+                'values' => $history,
+                'editable' => true,
+                'editURI' => '/bookings/edit?id=',
+                'editNum' => 0,
+                'deletable' => true,
+                'deleteURI' => '/bookings/destroy?id=',
+                'deleteNum' => 0
+            ]]);
+        } catch (DBException $e) {
+        }
     }
 
     /**
@@ -421,21 +425,34 @@ class Bookings extends Controller
         ]);
     }
 
-    /**
-     * @throws DBException
-     */
+
     public function update()
     {
         $bookings = new Booking();
-        $bookings->update(['start_date' => $_POST['start_date'], 'end_date' => $_POST['end_date']], $_GET['id']);
+        # TODO: @JosepPons if date is not between another booking
+        echo '<pre>$_REQUEST' . print_r($_REQUEST, true) . '</pre>';
+//        die;
+        try {
+            $where = $bookings->where('id', $_GET['id'], ['room_type']);
+            echo '<pre>$where' . print_r($where, true) . '</pre>';die;
+            /**
+             * TODO: @JosepPons Look all bookings that it has the same room type and then check that non of the bookings has the dates between
+             */
+            $bookings->update(['start_date' => $_POST['start_date'], 'end_date' => $_POST['end_date']], $_GET['id']);
+        } catch (DBException $e) {
+        }
         header('Location: ' . FORM_ACTION . '/bookings/currentUser');
+
     }
 
     public function destroy()
     {
-        $booking = new Booking();
-        if (!empty($_GET['id'])) {
-            $booking->destroy((int)$_GET['id']);
+        try {
+            $booking = new Booking();
+            if (!empty($_GET['id'])) {
+                $booking->destroy((int)$_GET['id']);
+            }
+        } catch (DBException $e) {
         }
         header('Location: ' . FORM_ACTION . '/bookings/currentUser');
     }

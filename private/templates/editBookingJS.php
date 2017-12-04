@@ -1,3 +1,4 @@
+
 <!--<script src="[[ formAction ]]/public/assets/js/editBookingJS.js"></script>-->
 <script>
     $(document).ready(function () {
@@ -12,11 +13,18 @@
             updateData();
         });
         var roomType = '[[ roomType ]]';
+
         function updateData() {
             $.getJSON('[[ formAction ]]/APIBookings/calculatePrice?roomType=' + roomType + '&start_date=' + sd.val() + '&end_date=' + ed.val(), function (data) {
-                $('span.price').text(data + '€');
+                if (data.number_rooms == 0) {
+                    $('span.price').text('there are ' + data.number_rooms + ' rooms aviable');
+                    // $('.submit-edit').hide();
+                } else
+                    $('span.price').text(data.price + "€");
+
             });
         }
+
         updateData();
     });
 </script>

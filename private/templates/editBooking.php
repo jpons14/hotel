@@ -17,7 +17,8 @@
             <input name="end_date" value="[[ end_date ]]" required="required" class="form-control datepicker" type="text" id="end_date"/>
         </div>
         <div class="form-group">
-            <input type="submit" class="btn btn-default" value="Reserve"/>
+            <input type="submit" class="btn btn-default submit-edit" value="Reserve"/>
         </div>
     </form>
 </div>
+<script src="[[ formAction ]]/public/assets/js/script.js"></script>

@@ -14,11 +14,14 @@ class APIBookings extends Controller implements ResourceInterface
      */
     public function index()
     {
-        $booking = new Booking();
-        $history = $booking->bookingsWhere('fk_users_dni_dni', $this->session->getVar('userDNI'), ['id', 'start_date', 'end_date', 'confirmed']);
+        try {
+            $booking = new Booking();
+            $history = $booking->bookingsWhere('fk_users_dni_dni', $this->session->getVar('userDNI'), ['id', 'start_date', 'end_date', 'confirmed']);
 
-        header('Content-Type: application/json');
-        echo json_encode($history);
+            header('Content-Type: application/json');
+            echo json_encode($history);
+        } catch (DBException $e) {
+        }
     }
 
     /**
@@ -77,73 +80,47 @@ class APIBookings extends Controller implements ResourceInterface
 
     public function calculatePrice()
     {
+        $room = new Room();
+        $rooms = $room->whereFkRoomTypesIdNameId($_GET['roomType']);
 
+        $counter = 0;
         $booking = new Booking();
-        //        $bookings = $booking->getBookingById(1)->start_date;
-        $roomTypes = new RoomType();
-        /**
-         * Check if in the room type is there any room with a booking between the specified dates
-         */
 
-        $allRoomTypes = $roomTypes->getAll();
 
-        $resultAllRoomTypes = [];
-
-        # Loop through all the room types
-        foreach ($allRoomTypes as $key => $item) {
-            $rooms = new Room();
-            $roomsList = $rooms->whereFkRoomTypesIdNameId($item[0]);
-
-            foreach ($roomsList as $roomArray) {
-                $tmpRoom = new Room();
-                $tmpRoom->setData($roomArray);
-                if ($tmpRoom->booked == '1') {
-                    // Check availability of this room
-                    try {
-                        $bookingsByRoomId = $booking->getBookingsByRoomId($tmpRoom->id);
-
-                        foreach ($bookingsByRoomId as $value) {
-                            $boolean = $booking->isBetweenDates($value->start_date, $_POST['start_date'], $_POST['end_date']);
-                            $boolean2 = $booking->isBetweenDates($value->end_date, $_POST['start_date'], $_POST['end_date']);
-                            if (!$boolean && !$boolean2) {
-                                # If i set this key will not be repeated the values
-                                $resultAllRoomTypes[$item[1]] = $item;
-                            }
-
-                        }
-                    } catch (DBException $e) {
+        foreach ($rooms->toArray() as $item) {
+            if ($item['booked'] == 0) {
+                $counter++;
+            } else {
+                try {
+                    $bookings = $booking->where('room_type', $item['fk_roomtypes_id_name'], ['id', 'start_date', 'end_date']);
+                    foreach ($bookings as $book) {
+                        $bool = $booking->isBetweenDates($_GET['start_date'], $book[1], $book[2]);
+                        if ($bool)
+                            $counter++;
                     }
-                } else {
-                    $resultAllRoomTypes[] = $item;
-                }
+                } catch (DBException $e){}
             }
-
-            // If the room types don't have any room available take it out of the array
-            $counter = 0;
-            foreach ($roomsList as $room) {
-                if ($item[1] == $room[6]) {
-                    if ($room[6])
-                        $counter++;
-                }
-            }
-            if ($counter == 0)
-                unset($allRoomTypes[$key]);
         }
 
-
-//        try {
-//            $roomType = new RoomType();
-//            $prices = $roomType->where('id', $_GET['roomType'], ['price']);
-//            $booking = new Booking();
-//            $booking->
-//            $days = strtotime($_GET['end_date']) - strtotime($_GET['start_date']);
-//            $numberDays = $days / 86400;
-//
-//            header('Content-Type: application/json');
-//            echo json_encode($prices[0][0] * $numberDays);
-//            return json_encode($prices);
-//        } catch (DBException $e) {
+//        header('Content-Type: application/json');
+//        if ($counter > 0) {
+//            echo json_encode([$rooms->toArray()]);
+//            echo json_encode(['number_rooms' => $counter]);
+//        } else {
+//            echo json_encode(['number_rooms' => 'no']);
 //        }
+        try {
+            $roomType = new RoomType();
+            $prices = $roomType->where('id', $_GET['roomType'], ['price']);
+            $booking = new Booking();
+            $days = strtotime($_GET['end_date']) - strtotime($_GET['start_date']);
+            $numberDays = $days / 86400;
+
+            header('Content-Type: application/json');
+            echo json_encode(['price' => $prices[0][0] * $numberDays, 'number_rooms' => $counter]);
+            return json_encode(['price' => $prices, 'number_rooms' => $counter]);
+        } catch (DBException $e) {
+        }
     }
 
 }
