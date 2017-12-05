@@ -5,6 +5,8 @@ use PHPMailer\PHPMailer\PHPMailer;
 
 class Bookings extends Controller
 {
+    use DateComparator;
+
     public function __construct($private)
     {
         parent::__construct($private);
@@ -428,17 +430,27 @@ class Bookings extends Controller
 
     public function update()
     {
-        $bookings = new Booking();
+        $booking = new Booking();
         # TODO: @JosepPons if date is not between another booking
         echo '<pre>$_REQUEST' . print_r($_REQUEST, true) . '</pre>';
 //        die;
         try {
-            $where = $bookings->where('id', $_GET['id'], ['room_type']);
-            echo '<pre>$where' . print_r($where, true) . '</pre>';die;
+            $roomType = $booking->where('id', $_GET['id'], ['room_type']);
+            $bookings = $booking->where('room_type', $roomType[0][0], ['id', 'start_date', 'end_date']);
+            echo '<pre>$roomType' . print_r($roomType, true) . '</pre>';
+            echo '<pre>$bookings' . print_r($bookings, true) . '</pre>';
+            $betweens = [];
+            foreach ($bookings as $item) {
+                $betweens[] = $this->dateBetween(['start_date' => $item[1], 'end_date' => $item[2]], ['start_date' => $_REQUEST['start_date'], 'end_date' => $_REQUEST['end_date']]);
+            }
+            if (in_array(true, $betweens)){
+                var_dump($betweens);
+            }
+            die;
             /**
              * TODO: @JosepPons Look all bookings that it has the same room type and then check that non of the bookings has the dates between
              */
-            $bookings->update(['start_date' => $_POST['start_date'], 'end_date' => $_POST['end_date']], $_GET['id']);
+            $booking->update(['start_date' => $_POST['start_date'], 'end_date' => $_POST['end_date']], $_GET['id']);
         } catch (DBException $e) {
         }
         header('Location: ' . FORM_ACTION . '/bookings/currentUser');

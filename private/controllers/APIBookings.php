@@ -3,6 +3,8 @@
 class APIBookings extends Controller implements ResourceInterface
 {
 
+    use DateComparator;
+
     public function __construct($private)
     {
         parent::__construct($private);
@@ -86,6 +88,28 @@ class APIBookings extends Controller implements ResourceInterface
         $counter = 0;
         $booking = new Booking();
 
+        $betweens = [];
+
+
+        try {
+//            $roomType = $booking->where('id', $_GET['roomType'], ['room_type']);
+//            echo '<pre>$roomType' . print_r($roomType, true) . '</pre>';
+            $bookings = $booking->where('room_type', $_GET['roomType'], ['id', 'start_date', 'end_date']);
+            foreach ($bookings as $item) {
+                $betweens[] = $this->dateBetween(['start_date' => $item[1], 'end_date' => $item[2]], ['start_date' => $_REQUEST['start_date'], 'end_date' => $_REQUEST['end_date']]);
+            }
+
+//            if (in_array(true, $betweens)){
+                $howmanyrooms = $room->where('fk_roomtypes_id_name', $_GET['roomType'], ['id']);
+                echo '<pre>$howManyRooms' . print_r($howmanyrooms, true) . '</pre>';
+//            }
+
+
+
+        } catch (DBException $e) {
+            echo $e->getMessage();
+        }
+
 
         foreach ($rooms->toArray() as $item) {
             if ($item['booked'] == 0) {
@@ -98,9 +122,11 @@ class APIBookings extends Controller implements ResourceInterface
                         if ($bool)
                             $counter++;
                     }
-                } catch (DBException $e){}
+                } catch (DBException $e) {
+                }
             }
         }
+
 
 //        header('Content-Type: application/json');
 //        if ($counter > 0) {
