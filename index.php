@@ -1,7 +1,7 @@
 <?php
 #### TEMPORAL ####
 
-error_reporting( E_ALL ^ E_NOTICE);
+error_reporting(E_ALL ^ E_NOTICE);
 
 // Just used for widgets
 $GLOBALS['formAction'] = '';
@@ -9,14 +9,14 @@ $GLOBALS['formAction'] = '';
 // Used for everything less widgets
 define('FORM_ACTION', '');
 
-define('ABSOLUTE_PATH', '/hotel');
+define('ABSOLUTE_PATH', '/');
 
-$GLOBALS['systemRoot'] = 'c:wamp64/www' . ABSOLUTE_PATH;
-define('SYSTEM_ROOT', 'c:wamp64/www' . ABSOLUTE_PATH);
+//define('URL', 'http://hotel.dev');
 
-define('IMG_USERS', 'c:wamp64/www' . ABSOLUTE_PATH     . '/public/assets/img/users/');
+$GLOBALS['systemRoot'] = 'C:/wamp64/www/hotel' . ABSOLUTE_PATH;
+define('SYSTEM_ROOT', 'C:/wamp64/www/hotel' . ABSOLUTE_PATH);
 
-
+define('IMG_USERS', 'C:/wamp64/www/hotel' . ABSOLUTE_PATH . '/public/assets/img/users/');
 
 
 $GLOBALS['controllerAndAction'] = include 'private/permissions/controllerAndAction.php';
@@ -30,7 +30,7 @@ include 'vendor/autoload.php';
 use Whoops\Handler\PrettyPageHandler;
 use Whoops\Handler\JsonResponseHandler;
 
-$run     = new Whoops\Run;
+$run = new Whoops\Run;
 $handler = new PrettyPageHandler;
 
 // Set the title of the error page:
@@ -50,31 +50,30 @@ if (Whoops\Util\Misc::isAjaxRequest()) {
 $run->register();
 
 
-
-foreach ( glob( __DIR__ . '/private/core/*.php' ) as $item ) {
+foreach (glob(__DIR__ . '/private/core/*.php') as $item) {
     require_once $item;
 }
 
-foreach ( glob( __DIR__ . '/private/interfaces/*.php' ) as $item ) {
+foreach (glob(__DIR__ . '/private/interfaces/*.php') as $item) {
     require_once $item;
 }
 
-foreach ( glob( __DIR__ . '/private/traits/*.php' ) as $item ) {
+foreach (glob(__DIR__ . '/private/traits/*.php') as $item) {
     require_once $item;
 }
-foreach ( glob( __DIR__ . '/private/controllers/*.php' ) as $item ) {
-    require_once $item;
-}
-
-foreach ( glob( __DIR__ . '/private/models/*.php' ) as $item ) {
+foreach (glob(__DIR__ . '/private/controllers/*.php') as $item) {
     require_once $item;
 }
 
-foreach ( glob( __DIR__ . '/private/views/*.php' ) as $item ) {
+foreach (glob(__DIR__ . '/private/models/*.php') as $item) {
     require_once $item;
 }
 
-foreach ( glob( __DIR__ . '/private/exceptions/*.php' ) as $item ) {
+foreach (glob(__DIR__ . '/private/views/*.php') as $item) {
+    require_once $item;
+}
+
+foreach (glob(__DIR__ . '/private/exceptions/*.php') as $item) {
     require_once $item;
 }
 

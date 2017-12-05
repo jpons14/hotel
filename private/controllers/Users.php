@@ -150,12 +150,12 @@ class Users extends Controller {
                 $userEmail = $this->session->getVar( 'userEmail' );
             }
 
-//            $ficheroSubido = IMG_USERS . basename( $userEmail . '.jpg' );
-//            if( move_uploaded_file( $_FILES[ 'userImage' ][ 'tmp_name' ], $ficheroSubido ) ) {
-//                echo "El fichero es válido y se subió con éxito.\n";
-//            } else {
-//                echo "¡Posible ataque de subida de ficheros!\n";
-//            }
+            $ficheroSubido = IMG_USERS . basename( $userEmail . '.jpg' );
+            if( move_uploaded_file( $_FILES[ 'userImage' ][ 'tmp_name' ], $ficheroSubido ) ) {
+                echo "El fichero es válido y se subió con éxito.\n";
+            } else {
+                echo "¡Posible ataque de subida de ficheros!\n";
+            }
 
             $userTypes = new UserType();
             $types = $userTypes->getAll();

@@ -2,6 +2,8 @@
 
 class Booking extends DB {
 
+    use DateComparator;
+
     private $id;
     private $start_date;
     private $end_date;
@@ -56,6 +58,38 @@ class Booking extends DB {
 
     public function __set( $key, $data ) {
         $this->$key = $data;
+    }
+
+    /**
+     * @param $roomType
+     * @param $startDate
+     * @param $endDate
+     * @return int
+     */
+    public function howManyRoomsAvaliable($roomType, $startDate, $endDate){
+        $room = new Room();
+        $betweens = [];
+
+        try {
+            $bookings = $this->where('room_type', $roomType, ['id', 'start_date', 'end_date']);
+            foreach ($bookings as $item) {
+                $betweens[] = $this->dateBetween(['start_date' => $item[1], 'end_date' => $item[2]], ['start_date' => $startDate, 'end_date' => $endDate]);
+            }
+
+
+            $howManyRooms = $room->where('fk_roomtypes_id_name', $roomType, ['id']);
+            $howManyRooms = count($howManyRooms);
+            if (in_array(true, $betweens)) {
+                foreach ($betweens as $between) {
+                    if ($between) {
+                        $howManyRooms--;
+                    }
+                }
+            }
+
+            return $howManyRooms;
+        } catch (DBException $e) {
+        }
     }
 
     /**

@@ -19,8 +19,9 @@
                 if (data.number_rooms == 0) {
                     $('span.price').text('there are ' + data.number_rooms + ' rooms aviable');
                     // $('.submit-edit').hide();
-                } else
+                } else {
                     $('span.price').text(data.price + "€");
+                }
 
             });
         }
