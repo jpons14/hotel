@@ -177,7 +177,7 @@ class Bookings extends Controller
             'startDate' => $_GET['start_date'],
             'endDate' => $_GET['end_date'],
             'roomType' => $roomTypes[0][1],
-            'price' => $numberDays * $roomTypes[2],
+            'price' => $numberDays * $roomTypes [2],
         ]);
 
     }
@@ -201,53 +201,39 @@ class Bookings extends Controller
 
     public function index()
     {
-        $booking = new Booking();
-        $booking->getAllBookings();
-        $elements = $booking->getAllBookings(['id', 'fk_users_dni_dni', 'start_date', 'end_date']);
+        $this->menu();
 
-        foreach ($elements as $index => $element) {
-            if ($returneds[$index][0] == 1) {
-                $elements[$index][2] = '<div class="alert alert-success"> ' . $elements[$index][2] . '</div>';
-            }
-            // if it's in the return day -> orange, if its late -> red
-            if (strtotime(date('m/d/Y')) == strtotime($element[4])) {
-                $elements[$index][4] = '<div class="alert alert-warning">' . $element[4] . '</div>';
-            } elseif (strtotime(date('m/d/Y')) > strtotime($element[4])) {
-                $elements[$index][4] = '<div class="alert alert-danger">' . $element[4] . '</div>';
-            }
+        try {
+            $booking = new Booking();
+            $booking->getAllBookings();
+            $elements = $booking->getAllBookings(['id', 'fk_users_dni_dni', 'start_date', 'end_date']);
 
+
+            new View(['bookingsSearch']);
+
+            new View([], [], ['TableWidget' => [
+                'fields' => ['id', 'User Email', 'Book Name', 'Pick Up', 'Pick Off',],
+                'values' => $elements,
+                'editable' => true,
+                'editURI' => '/bookings/return?id=',
+                'editNum' => 0
+            ]]);
+        } catch (DBException $e) {
         }
-
-
-        $user = new User($this->session->getVar('userEmail'));
-        $users = $user->getAllUsers(['email']);
-
-
-        new View(['header']);
-        new View([], [], ['MenuWidget' => [
-            'userType' => $this->session->getVar('userType')
-        ]]);
-
-        new View(['bookingsSearch']);
-
-        new View([], [], ['TableWidget' => [
-            'fields' => ['id', 'User Email', 'Book Name', 'Pick Up', 'Pick Off', 'Return'],
-            'values' => $elements,
-            'editable' => true,
-            'editURI' => '/bookings/return?id=',
-            'editNum' => 0
-        ]]);
     }
 
     public function return()
     {
-        $booking = new Booking();
-        if (isset($_GET['id'])) {
-            $booking->return($_GET['id']);
+        try {
+            $booking = new Booking();
+            if (isset($_GET['id'])) {
+                $booking->return($_GET['id']);
+            }
+
+            header('Location: ' . FORM_ACTION . '/bookings/index');
+
+        } catch (DBException $e) {
         }
-
-        header('Location: ' . FORM_ACTION . '/bookings/index');
-
     }
 
     public function booking()
@@ -438,7 +424,8 @@ class Bookings extends Controller
             try {
                 $booking->update(['start_date' => $_REQUEST['start_date'], 'end_date' => $_REQUEST['end_date']], $_REQUEST['id']);
                 header('Location: ' . FORM_ACTION . '/bookings/currentUser');
-            } catch (DBException $e){}
+            } catch (DBException $e) {
+            }
         }
 
 //        $booking = new Booking();

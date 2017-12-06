@@ -20,6 +20,10 @@ class User extends DB {
 
     private $surnames;
 
+    private $hidden = [
+        'hidden'
+    ];
+
     /**
      *
      * If all go well, it will start session
@@ -266,6 +270,17 @@ class User extends DB {
     public function getAll(  ) {
         $this->setTable( 'users' );
         $this->select();
+    }
+
+    public function toArray() {
+        $attributes = get_object_vars( $this );
+        $array = array();
+        foreach( $attributes as $index => $attribute ) {
+            if( !in_array( $index, $this->hidden ) )
+                $array[ $index ] = $attribute;
+        }
+
+        return $array;
     }
 
 }
