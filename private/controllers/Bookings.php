@@ -209,7 +209,7 @@ class Bookings extends Controller
             $elements = $booking->getAllBookings(['id', 'fk_users_dni_dni', 'start_date', 'end_date']);
 
 
-            new View(['bookingsSearch']);
+            new View(['bookingsSearch'], ['patterns' => 'name,start_date,end_date,dni,room_type,adults_number,children_number']);
 
             new View([], [], ['TableWidget' => [
                 'fields' => ['id', 'User Email', 'Book Name', 'Pick Up', 'Pick Off',],
@@ -268,14 +268,16 @@ class Bookings extends Controller
         header('Location: ' . FORM_ACTION . '/books/details?id=' . $_GET['bookId']);
     }
 
+
     public function by()
     {
-        new View(['header']);
-        new View([], [], ['MenuWidget' => [
-            'userType' => $this->session->getVar('userType')
-        ]]);
+        $this->menu();
+        $searcher = explode(':', $_REQUEST['textSearcher']);
+        $_REQUEST['key'] = $searcher[0];
+        $_REQUEST['value'] = $searcher[1];
 
-        $tp = [];
+        echo '<pre>$searcher' . print_r($searcher, true) . '</pre>';
+        echo '<pre>$_REQUEST' . print_r($_REQUEST, true) . '</pre>';die;
 
         switch ($_POST['what']) {
             case 'userEmail':
