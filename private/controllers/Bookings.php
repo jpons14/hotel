@@ -206,17 +206,20 @@ class Bookings extends Controller
         try {
             $booking = new Booking();
             $booking->getAllBookings();
-            $elements = $booking->getAllBookings(['id', 'fk_users_dni_dni', 'start_date', 'end_date']);
+            $elements = $booking->getAllBookings(['id', 'start_date', 'end_date', 'fk_users_dni_dni', 'room_type']);
 
 
             new View(['bookingsSearch'], ['patterns' => 'name,start_date,end_date,dni,room_type,adults_number,children_number']);
 
             new View([], [], ['TableWidget' => [
-                'fields' => ['id', 'User Email', 'Book Name', 'Pick Up', 'Pick Off',],
+                'fields' => ['id', 'start_date', 'end_date', 'room_type', 'fk_users_dni_dni', 'edit', 'delete'],
                 'values' => $elements,
                 'editable' => true,
-                'editURI' => '/bookings/return?id=',
-                'editNum' => 0
+                'editURI' => '/bookings/edit?id=',
+                'editNum' => 0,
+                'deletable' => true,
+                'deleteURI' => '/bookings/destroy?id=',
+                'deleteNum' => 0
             ]]);
         } catch (DBException $e) {
         }
@@ -276,32 +279,31 @@ class Bookings extends Controller
         $_REQUEST['key'] = $searcher[0];
         $_REQUEST['value'] = $searcher[1];
 
-        echo '<pre>$searcher' . print_r($searcher, true) . '</pre>';
-        echo '<pre>$_REQUEST' . print_r($_REQUEST, true) . '</pre>';die;
+        $tp = $this->byKeyValue($_REQUEST['key'], $_REQUEST['value']);
 
-        switch ($_POST['what']) {
-            case 'userEmail':
-                $tp = $this->byUserEmail($_POST['text']);
-                break;
-            case 'bookId':
-                $tp = $this->byBookId($_POST['text']);
-                break;
-            case 'notReturned':
-                $tp = $this->byNotReturned('past');
-                break;
-            case 'todayReturn':
-                $tp = $this->byNotReturned('today');
-                break;
-            default:
-                if (!isset($_POST['text'])) {
-                    $_POST['text'] = $_GET['text'];
-                }
-                $tp = $this->byBookId($_POST['text']);
-                break;
-        }
+//        switch ($_REQUEST['key']) {
+//            case 'start_date':
+//                $tp = $this->byKeyValue($_REQUEST['key'], $_REQUEST['value']);
+//                break;
+//            case 'bookId':
+//                $tp = $this->byBookId($_POST['text']);
+//                break;
+//            case 'notReturned':
+//                $tp = $this->byNotReturned('past');
+//                break;
+//            case 'todayReturn':
+//                $tp = $this->byNotReturned('today');
+//                break;
+//            default:
+//                if (!isset($_POST['text'])) {
+//                    $_POST['text'] = $_GET['text'];
+//                }
+//                $tp = $this->byBookId($_POST['text']);
+//                break;
+//        }
 
         new View(['bookingsSearch'], [], ['TableWidget' => [
-            'fields' => ['id', 'User Email', 'Book Name', 'Pick Up', 'Pick Off', 'Return'],
+            'fields' => ['id', 'Start Date', 'End Date', 'User DNI', 'Room Type'],
             'values' => $tp,
             'editable' => true,
             'editURI' => '/bookings/return?id=',
@@ -310,12 +312,29 @@ class Bookings extends Controller
 
     }
 
+    private function byKeyValue($key, $value)
+    {
+        try {
+            $booking = new Booking();
+            $bookings = $booking->where($key, $value, ['id', 'start_date', 'end_date', 'fk_users_dni_dni', 'room_type']);
+            // Remove result of fk_users_dni_dni
+            foreach ($bookings as $k => $b) {
+                unset($bookings[$k][count($b) - 1]);
+            }
+            return $bookings;
+        } catch (DBException $e) {
+        }
+    }
+
     public function byUserEmail($text)
     {
-        $booking = new Booking();
-        $bookings = $booking->byEmail($text);
+        try {
+            $booking = new Booking();
+            $bookings = $booking->byEmail($text);
 
-        return $bookings;
+            return $bookings;
+        } catch (DBException $e) {
+        }
     }
 
     public function byBookId($text = '')

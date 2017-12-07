@@ -64,7 +64,6 @@ CODE;
     private function addForHoteliers() {
         if( $GLOBALS[ 'usersPermission' ][ $this->vars[ 'userType' ] ] >= $GLOBALS[ 'usersPermission' ][ 'hotelier' ] ) {
             $this->return .= <<<CODE
-                        <li class="nav-item"><a class="nav-link" href="$GLOBALS[formAction]/bookings/toOtherUser">Book To Other User</a></li>
                          <li class="nav-item"><a class="nav-link" href="$GLOBALS[formAction]/users/allUsers">All Users</a></li>
                          <li class="nav-item"><a class="nav-link" href="$GLOBALS[formAction]/rooms/index"><b>Rooms</b></a></li>
                          <li class="nav-item"><a class="nav-link" href="$GLOBALS[formAction]/roomTypes/index"><b>Room Types</b></a></li>
@@ -76,7 +75,6 @@ CODE;
     private function addForRoots() {
         if( $GLOBALS[ 'usersPermission' ][ $this->vars[ 'userType' ] ] >= $GLOBALS[ 'usersPermission' ][ 'root' ] ) {
             $this->return .= <<<CODE
-                <li class="nav-item"><a class="nav-link" href="$GLOBALS[formAction]/booksParamethers/index">Paramethers</a></li>
                 <li class="nav-item"><a class="nav-link" href="$GLOBALS[formAction]/bookings/index">All Bookings</a></li>
 CODE;
         }
