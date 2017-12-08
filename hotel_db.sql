@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50717
 File Encoding         : 65001
 
-Date: 2017-12-05 16:45:15
+Date: 2017-12-08 13:38:50
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -21,14 +21,18 @@ SET FOREIGN_KEY_CHECKS=0;
 DROP TABLE IF EXISTS `additional_services`;
 CREATE TABLE `additional_services` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `additional_service_name` varchar(255) NOT NULL,
+  `text` varchar(255) NOT NULL,
   `price` decimal(10,0) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of additional_services
 -- ----------------------------
+INSERT INTO `additional_services` VALUES ('1', 'breakfast', '55');
+INSERT INTO `additional_services` VALUES ('2', 'lunch', '60');
+INSERT INTO `additional_services` VALUES ('3', 'dinner', '70');
+INSERT INTO `additional_services` VALUES ('6', 'cleaning', '100');
 
 -- ----------------------------
 -- Table structure for bookings
@@ -53,17 +57,18 @@ CREATE TABLE `bookings` (
   CONSTRAINT `bookings_ibfk_1` FOREIGN KEY (`room_type`) REFERENCES `roomtypes` (`id`),
   CONSTRAINT `bookings_room_id` FOREIGN KEY (`fk_rooms_id_name`) REFERENCES `rooms` (`id`),
   CONSTRAINT `bookings_user_dni` FOREIGN KEY (`fk_users_dni_dni`) REFERENCES `users` (`dni`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of bookings
 -- ----------------------------
-INSERT INTO `bookings` VALUES ('1', '01/18/2017', '11/20/2017', '1', 'visa', '1', '2', '0', '41609409v', '1', '2');
+INSERT INTO `bookings` VALUES ('1', '01/18/2017', '02/28/2018', '1', 'visa', '1', '2', '0', '41609409v', '1', '2');
 INSERT INTO `bookings` VALUES ('2', '11/17/2017', '12/21/2017', '1', 'visa', '0', '2', '0', '41609409v', '1', '1');
 INSERT INTO `bookings` VALUES ('3', '01/11/2018', '01/25/2018', '0', 'visa', '0', '2', '0', '41609409v', '1', '1');
-INSERT INTO `bookings` VALUES ('6', '12/18/2017', '12/22/2017', '1', 'visa', '0', '2', '0', '41609230e', '1', '2');
+INSERT INTO `bookings` VALUES ('6', '01/27/2018', '01/30/2018', '1', 'visa', '0', '2', '0', '41609230e', '1', '2');
 INSERT INTO `bookings` VALUES ('7', '11/29/2017', '01/17/2018', '0', 'visa', '0', '2', '0', '41609230e', '1', '1');
 INSERT INTO `bookings` VALUES ('9', '11/22/2017', '05/23/2018', '0', 'visa', '0', '2', '0', '41609230e', '1', '1');
+INSERT INTO `bookings` VALUES ('10', '01/01/2019', '01/18/2019', '1', 'visa', '0', '2', '0', 'x4374801v', '1', '1');
 
 -- ----------------------------
 -- Table structure for booking_additionals_services
@@ -78,11 +83,12 @@ CREATE TABLE `booking_additionals_services` (
   KEY `additional_service_booking_additional_service_id` (`additional_service_id`),
   CONSTRAINT `additional_service_booking_additional_service_id` FOREIGN KEY (`additional_service_id`) REFERENCES `additional_services` (`id`),
   CONSTRAINT `additional_service_booking_booking_id` FOREIGN KEY (`booking_id`) REFERENCES `bookings` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of booking_additionals_services
 -- ----------------------------
+INSERT INTO `booking_additionals_services` VALUES ('1', '1', '1');
 
 -- ----------------------------
 -- Table structure for rooms
@@ -107,7 +113,7 @@ INSERT INTO `rooms` VALUES ('1', '2', '2', '0', 'caixer senyorffffffffffff', '1'
 INSERT INTO `rooms` VALUES ('2', '1', '2', '0', 'hello', '1');
 INSERT INTO `rooms` VALUES ('3', '3', '2', '0', 'josep room', '0');
 INSERT INTO `rooms` VALUES ('4', '1', '234', '0', 'josep', '1');
-INSERT INTO `rooms` VALUES ('5', '1', '22', '3', 'jpons1room', '1');
+INSERT INTO `rooms` VALUES ('5', '2', '22', '3', 'jpons1room', '1');
 
 -- ----------------------------
 -- Table structure for roomtypes
@@ -148,6 +154,7 @@ CREATE TABLE `users` (
 -- ----------------------------
 INSERT INTO `users` VALUES ('41609230e', 'dani', 'dani', 'dawdani24@jmail.org', '666666666', '$2y$10$nrgA0YGvQY3T1lxGruSrROae3tsmDU5AbdycdAqjVrjDWxxTh2tCW', '3');
 INSERT INTO `users` VALUES ('41609409v', 'Josep Pons Pons', 'Josep Pons Pons', 'jponspons@gmail.com', '666666666', '$2y$10$iPLQNIzQfBcafzK5xcaVHOek7cIKigZJSFY6sPOasP2GedN.JsbJm', '1');
+INSERT INTO `users` VALUES ('x4374801v', 'Andersito', 'Andersito', 'daw2alunauceta@iesjoanramis.org', '666666666', '$2y$10$gjw0zNgRR2ZI8OTVawRL1.B73fLnmtKvVSSPOg06pT6t9tcgXLP0e', '3');
 
 -- ----------------------------
 -- Table structure for usertypes
