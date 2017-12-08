@@ -6,28 +6,43 @@
  * Time: 15:34
  */
 
-class RoomType extends DB{
-    public function __construct( ) {
-        parent::__construct( );
+class RoomType extends DB
+{
+    public function __construct()
+    {
+        parent::__construct();
         $this->setTable('roomtypes');
         $this->setFields(['id', 'name', 'price']);
     }
 
-    public function getAll( $fields = [] ) {
-        return $this->select($fields);
+    public function getAll($fields = [])
+    {
+        try {
+            return $this->select($fields);
+        } catch (DBException $e) {
+        }
     }
 
-    public function getById( $id ) {
-        return $this->find($id)[0];
+    public function getById($id)
+    {
+        try {
+            return $this->find($id)[0];
+        } catch (DBException $e) {
+        }
     }
 
-    public function __set( $name, $value ) {
+    public function __set($name, $value)
+    {
         // TODO: Implement __set() method.
     }
 
 
-    public function __get( $name ) {
-        return $this->select([$name]);
+    public function __get($name)
+    {
+        try {
+            return $this->select([$name]);
+        } catch (DBException $e) {
+        }
     }
 
 

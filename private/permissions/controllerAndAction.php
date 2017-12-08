@@ -58,11 +58,23 @@ return [
         'update' => 200,
         'destroy' => 200
     ],
+    'AdditionalServices' => [
+        'index' => 200,
+        'create' => 200,
+        'store' => 200,
+        'edit' => 200,
+        'update' => 200,
+        'destroy' => 200
+    ],
     'APIRoomsTypes' => [
-        'index' => 100
+        'index' => 100,
+        'getNameById' => 100,
     ],
     'APIBookings' => [
         'index' => 100,
         'calculatePrice' => 100
-    ]
+    ],
+    'APIAdditionalServices' => [
+        'index' => 100,
+    ],
 ];

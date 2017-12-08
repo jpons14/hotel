@@ -2,7 +2,7 @@
 
 class RoomTypes extends Controller
 {
-    use Navigator;
+    use Navigator, Redirectable;
 
     public function __construct($private)
     {
@@ -59,8 +59,11 @@ class RoomTypes extends Controller
     public function destroy()
     {
         $roomType = new RoomType();
-        $roomType->destroy((int)$_GET['id'] ?? '');
-        header('Location: ' . FORM_ACTION . '/roomTypes/index');
+        try {
+            $roomType->destroy((int)$_GET['id'] ?? '');
+            $this->redirect('/roomTypes/index');
+            header('Location: ' . FORM_ACTION . '/roomTypes/index');
+        } catch (DBException $e){}
     }
 
 }

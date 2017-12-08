@@ -89,6 +89,8 @@ class Bookings extends Controller
 
     public function sendMails()
     {
+        echo '<pre>$_REQUEST' . print_r($_REQUEST, true) . '</pre>';die;
+
         $hashDni = hash('ripemd160', $_POST['dni']);
         $booking = new Booking();
         try {
@@ -104,6 +106,12 @@ class Bookings extends Controller
                 'fk_rooms_id_name' => 1,
                 'room_type' => $_GET['room_type_id']
             ]);
+
+            $additionalService = new AdditionalService();
+            foreach ($_REQUEST['additional_services'] as $additional_service) {
+                $additionalService->insert(['booking_id' => $bookingID, 'additional_service_id' => $additional_service]);
+            }
+
         } catch (DBException $e) {
         }
 
@@ -176,7 +184,7 @@ class Bookings extends Controller
         new View(['confirmBooking'], [
             'startDate' => $_GET['start_date'],
             'endDate' => $_GET['end_date'],
-            'roomType' => $roomTypes[0][1],
+            'roomType' => $roomTypes[1],
             'price' => $numberDays * $roomTypes [2],
         ]);
 

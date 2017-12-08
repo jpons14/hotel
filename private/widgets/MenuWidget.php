@@ -67,6 +67,7 @@ CODE;
                          <li class="nav-item"><a class="nav-link" href="$GLOBALS[formAction]/users/allUsers">All Users</a></li>
                          <li class="nav-item"><a class="nav-link" href="$GLOBALS[formAction]/rooms/index"><b>Rooms</b></a></li>
                          <li class="nav-item"><a class="nav-link" href="$GLOBALS[formAction]/roomTypes/index"><b>Room Types</b></a></li>
+                         <li class="nav-item"><a class="nav-link" href="$GLOBALS[formAction]/additionalServices/index"><b>Add Serv</b></a></li>
 CODE;
 
         }

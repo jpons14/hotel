@@ -1,6 +1,9 @@
 <?php
 
-class APIRoomsTypes extends Controller implements ResourceInterface {
+class APIRoomsTypes extends Controller implements ResourceInterface
+{
+
+    use Apiable;
 
     /**
      * method of call
@@ -8,8 +11,9 @@ class APIRoomsTypes extends Controller implements ResourceInterface {
      */
     private $method;
 
-    public function __construct( $private ) {
-        parent::__construct( $private );
+    public function __construct($private)
+    {
+        parent::__construct($private);
         $this->method = $_SERVER['REQUEST_METHOD'];
     }
 
@@ -18,11 +22,12 @@ class APIRoomsTypes extends Controller implements ResourceInterface {
      * Display a listing of the resource.
      * @return mixed
      */
-    public function index() {
+    public function index()
+    {
         $roomType = new RoomType();
 
         $roomTypes = $roomType->getAll();
-        
+
         header('Content-Type: application/json');
         echo json_encode($roomTypes);
         return json_encode($roomTypes);
@@ -32,7 +37,8 @@ class APIRoomsTypes extends Controller implements ResourceInterface {
      * Show the form for creating a new resource.
      * @return mixed
      */
-    public function create() {
+    public function create()
+    {
         // TODO: Implement create() method.
     }
 
@@ -40,7 +46,8 @@ class APIRoomsTypes extends Controller implements ResourceInterface {
      * Store a newly created resource in storage.
      * @return mixed
      */
-    public function store() {
+    public function store()
+    {
         // TODO: Implement store() method.
     }
 
@@ -48,7 +55,8 @@ class APIRoomsTypes extends Controller implements ResourceInterface {
      * Display the specified resource.
      * @return mixed
      */
-    public function show() {
+    public function show()
+    {
         $roomType = new RoomType();
         $roomTypes = $roomType->getById(1);
 
@@ -61,7 +69,8 @@ class APIRoomsTypes extends Controller implements ResourceInterface {
      * Show the form for editing the specified resource.
      * @return mixed
      */
-    public function edit() {
+    public function edit()
+    {
         // TODO: Implement edit() method.
     }
 
@@ -69,7 +78,8 @@ class APIRoomsTypes extends Controller implements ResourceInterface {
      * Update the specified resource in storage.
      * @return mixed
      */
-    public function update() {
+    public function update()
+    {
         // TODO: Implement update() method.
     }
 
@@ -77,7 +87,20 @@ class APIRoomsTypes extends Controller implements ResourceInterface {
      * Remove the specified resource from storage.
      * @return mixed
      */
-    public function destroy() {
+    public function destroy()
+    {
         // TODO: Implement destroy() method.
     }
+
+    public function getNameById()
+    {
+        try {
+            $id = $_GET['id'];
+            $roomType = new RoomType();
+            $roomTypes = $roomType->where('id', $id, ['name']);
+            $this->response($roomTypes);
+        } catch (DBException $e) {
+        }
+    }
+
 }
