@@ -212,7 +212,7 @@ class Bookings extends Controller
             new View(['bookingsSearch'], ['patterns' => 'name,start_date,end_date,dni,room_type,adults_number,children_number']);
 
             new View([], [], ['TableWidget' => [
-                'fields' => ['id', 'start_date', 'end_date', 'room_type', 'fk_users_dni_dni', 'edit', 'delete'],
+                'fields' => ['id', 'start_date', 'end_date', 'room_type', 'fk_users_dni_dni', 'edit'],
                 'values' => $elements,
                 'editable' => true,
                 'editURI' => '/bookings/edit?id=',
