@@ -89,8 +89,6 @@ class Bookings extends Controller
 
     public function sendMails()
     {
-        echo '<pre>$_REQUEST' . print_r($_REQUEST, true) . '</pre>';die;
-
         $hashDni = hash('ripemd160', $_POST['dni']);
         $booking = new Booking();
         try {
