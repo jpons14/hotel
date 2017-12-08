@@ -14,7 +14,7 @@ class RoomTypes extends Controller
         $this->menu();
         $roomType = new RoomType();
         $roomTypes = $roomType->getAll();
-        new View(['createRoomButton', 'confirmation'], [], ['TableWidget' => [
+        new View(['roomTypes/createRoomTypeButton', 'roomTypes/confirmation'], [], ['TableWidget' => [
             'fields' => ['id', 'name', 'price', 'edit', 'delete'],
             'values' => $roomTypes,
             'editable' => true,
@@ -24,20 +24,22 @@ class RoomTypes extends Controller
             'deleteURI' => '/roomTypes/destroy?id=',
             'deleteNum' => 0
         ]]);
-        new View(['createRoomButton']);
+        new View(['roomTypes/createRoomTypeButton']);
     }
 
     public function create()
     {
         $this->menu();
-        new View(['createRoomType']);
+        new View(['roomTypes/create']);
     }
 
     public function store()
     {
         $roomType = new RoomType();
-        $roomType->insert(['name' => $_POST['name'] ?? '', 'price' => $_POST['price'] ?? 0]);
-        header('Location: ' . FORM_ACTION . '/roomTypes/index');
+        try {
+            $roomType->insert(['name' => $_POST['name'] ?? '', 'price' => $_POST['price'] ?? 0]);
+        } catch (DBException $e){}
+        $this->redirect('/roomTypes/index');
     }
 
     public function edit()
@@ -45,15 +47,17 @@ class RoomTypes extends Controller
         $this->menu();
         $roomType = new RoomType();
         $roomType = $roomType->getById($_GET['id'] ?? '');
-        new View(['editRoomType'], ['id' => $roomType[0], 'name' => $roomType[1], 'price' => $roomType[2]]);
+        new View(['roomTypes/edit'], ['id' => $roomType[0], 'name' => $roomType[1], 'price' => $roomType[2]]);
     }
 
     public function update()
     {
         $this->menu();
         $roomTypes = new RoomType();
-        $roomTypes->update(['name' => $_POST['name'] ?? 'undefined', 'price' => $_POST['price'] ?? 0], $_GET['id']);
-        header('Location: ' . FORM_ACTION . '/roomTypes/index');
+        try {
+            $roomTypes->update(['name' => $_POST['name'] ?? 'undefined', 'price' => $_POST['price'] ?? 0], $_GET['id']);
+        } catch (DBException $e){}
+        $this->redirect('/roomTypes/index');
     }
 
     public function destroy()
@@ -62,7 +66,6 @@ class RoomTypes extends Controller
         try {
             $roomType->destroy((int)$_GET['id'] ?? '');
             $this->redirect('/roomTypes/index');
-            header('Location: ' . FORM_ACTION . '/roomTypes/index');
         } catch (DBException $e){}
     }
 
