@@ -6,7 +6,10 @@
             <input class="form-control" type="text" placeholder="Name" name="name" value="[[ name ]]"/>
         </div>
         <div class="form-group">
-            <input class="form-control" type="text" placeholder="Address" name="address" value="[[ address ]]"/>
+            <input class="form-control" type="text" placeholder="Surnames" name="surnames" value="[[ surnames ]]"/>
+        </div>
+        <div class="form-group">
+            <input class="form-control" type="email" placeholder="E-mail" name="email" value="[[ email ]]"/>
         </div>
         <div class="form-group">
             <input class="form-control" type="text" placeholder="Phone" name="phone" value="[[ phone ]]"/>

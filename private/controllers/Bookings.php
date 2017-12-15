@@ -80,7 +80,6 @@ class Bookings extends Controller
             if ($counter == 0)
                 unset($allRoomTypes[$key]);
         }
-        echo '<pre>$resultAllRoomTypes' . print_r($resultAllRoomTypes, true) . '</pre>';
         new View(['roomTypesListJavascript'], [], ['roomsTypesListWidget' => [
             'data' => $resultAllRoomTypes
         ]]);
@@ -108,6 +107,7 @@ class Bookings extends Controller
             $additionalService = new AdditionalService();
             foreach ($_REQUEST['additional_services'] as $additional_service) {
                 $additionalService->insert(['booking_id' => $bookingID, 'additional_service_id' => $additional_service]);
+
             }
 
         } catch (DBException $e) {
@@ -161,12 +161,15 @@ class Bookings extends Controller
     public function confirmBookingDNI()
     {
         $this->menu();
-        if (hash('ripemd160', $_POST['dni']) == $_GET['dni']) {
-            $booking = new Booking();
-            $booking->update(['confirmed' => '1'], $_GET['bid']);
-            new VIew(['confirmed'], ['message' => 'PERFECT Booking confirmed']);
-        } else {
-            new VIew(['confirmed'], ['message' => 'ERROR the DNI introduced is not correct']);
+        try {
+            if (hash('ripemd160', $_POST['dni']) == $_GET['dni']) {
+                $booking = new Booking();
+                $booking->update(['confirmed' => '1'], $_GET['bid']);
+                new VIew(['confirmed'], ['message' => 'PERFECT Booking confirmed']);
+            } else {
+                new VIew(['confirmed'], ['message' => 'ERROR the DNI introduced is not correct']);
+            }
+        } catch (DBException $e) {
         }
     }
 
@@ -399,8 +402,11 @@ class Bookings extends Controller
             ]]);
 
             new View(['bookingsSearchOnlyID', 'tmpPushJS'], [], ['TableWidget' => [
-                'fields' => ['id', 'Start Date', 'End Date', 'Confirmed', 'Edit', 'Delete'],
+                'fields' => ['id', 'Start Date', 'End Date', 'Confirmed', 'View', 'Edit', 'Delete'],
                 'values' => $history,
+                'viewable' => true,
+                'viewURI' => '/bookings/view?id=',
+                'viewNum' => 0,
                 'editable' => true,
                 'editURI' => '/bookings/edit?id=',
                 'editNum' => 0,
@@ -408,6 +414,41 @@ class Bookings extends Controller
                 'deleteURI' => '/bookings/destroy?id=',
                 'deleteNum' => 0
             ]]);
+        } catch (DBException $e) {
+        }
+    }
+
+
+    public function view()
+    {
+        $this->menu();
+        $id = $_GET['id'];
+        $booking = new Booking();
+        try {
+            $all = $booking->where('id', $id, ['id', 'start_date', 'end_date', 'room_type']);
+            $roomType = new RoomType();
+            $roomTypeName = $roomType->where('id', $all[0][3], ['name', 'id']);
+
+            $as = new AdditionalService();
+
+            $bas = new BookingAdditionalService();
+            $bass = $bas->where('booking_id', $id);
+
+            $priceServs = 0;
+            foreach ($bass as $value) {
+                $addServ = $as->where('id', $value[2]);
+                $priceServs += $addServ[0][2];
+            }
+
+            $price = $this->calculatePrice($all[0][1], $all[0][2], $roomTypeName[0][1]);
+
+            new View(['bookings/view'], [
+                'startDate' => $all[0][1],
+                'endDate' => $all[0][2],
+                'roomTypeName' => $roomTypeName[0][0],
+                'price' => $price,
+                'add_serv_price' => $priceServs
+            ]);
         } catch (DBException $e) {
         }
     }

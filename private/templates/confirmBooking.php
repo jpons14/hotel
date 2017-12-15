@@ -55,8 +55,9 @@
         $('select').on('change', function () {
             var ids = $('.js-example-basic-multiple').val();
             var tmpPrice = 0;
+            console.log(ids);
             $.each(ids, function (key, val) {
-                tmpPrice += parseInt(result[val - 1].price);
+                tmpPrice += parseInt(result[key].price);
             });
             price = tmpPrice;
             $('.price_additional_services').text(price + '€');

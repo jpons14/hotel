@@ -26,6 +26,10 @@ class UserEditProfile extends FatherWidget {
                 <div class="form-group">
                     <input class="form-control" type="text" placeholder="Name" name="name" value="' . $this->vars[ 'userName' ] . '"/>
                 </div>
+                
+                <div class="form-group">
+                    <input type="text" class="form-control" name="surnames" placeholder="Address" value="' . $this->vars[ 'surnames' ] . '">
+                </div>
                 <div class="form-group">
                 <label for="userType"></label>
                     <select class="form-control" name="userType" id="userType">
@@ -33,9 +37,6 @@ class UserEditProfile extends FatherWidget {
                         <option ' . $hotelier . ' value="hotelier">Hotelier</option>
                         <option ' . $root . ' value="root">Root</option>
                     </select>
-                </div>
-                <div class="form-group">
-                    <input type="text" class="form-control" name="address" placeholder="Address" value="' . $this->vars[ 'address' ] . '">
                 </div>
                 <div class="form-group">
                     <input type="text" class="form-control" name="phone" placeholder="Phone" value="' . $this->vars[ 'phone' ] . '">

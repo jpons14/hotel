@@ -24,4 +24,15 @@ trait  DateComparator
             return false;
         }
     }
+
+    public function calculatePrice($startDate, $endDate, $roomTypeId)
+    {
+        $roomType = new RoomType();
+        try {
+            $roomTypes = $roomType->where('id', $roomTypeId, ['price']);
+            $days = strtotime($endDate) - strtotime($startDate);
+            $numberDays = $days / 86400;
+            return $numberDays * $roomTypes[0][0];
+        } catch (DBException $e){}
+    }
 }

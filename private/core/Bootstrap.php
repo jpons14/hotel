@@ -51,8 +51,8 @@ class Bootstrap {
                 $this->callController( $security->private );
             }
         } catch( PermissionException $e ) {
-            echo '<pre>$_GET' . print_r( $_GET, true ) . '</pre>';
             setcookie('nep_get', json_encode($_GET), time() + (60 * 20), '/');
+            echo '<pre>$_GET' . print_r( $_GET, true ) . '</pre>';
             echo $e->showException();
         }
     }

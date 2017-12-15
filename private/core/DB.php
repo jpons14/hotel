@@ -71,6 +71,10 @@ class DB {
         $this->table = $table;
     }
 
+    /**
+     * @param $fields
+     * @throws VarNoInitializedException
+     */
     protected function setFields( $fields ) {
         if( !isset( $this->table ) || $this->table == '' )
             throw new VarNoInitializedException( '$this->table is not initialized or is not set' );
@@ -432,6 +436,8 @@ class DB {
         }
 
         $sql = "UPDATE $this->table SET " . implode( ' , ', $array ) . ' WHERE `' . $idName . '` = \'' . $id . '\';';
+
+        echo '<pre>$sql' . print_r($sql, true) . '</pre>';
 
         return $this->executeUpdate( $sql );
     }

@@ -22,6 +22,7 @@ return [
         'showForms' => 1,
         'sendMails' => 1,
         'confirmBooking' => 100,
+        'view' => 100,
         'edit' => 100,
         'update' => 100,
         'destroy' => 100,
