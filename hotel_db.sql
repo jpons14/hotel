@@ -50,13 +50,13 @@ CREATE TABLE `bookings` (
   `fk_users_dni_dni` varchar(40) NOT NULL,
   `fk_rooms_id_name` int(11) NOT NULL,
   `room_type` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `bookings_user_dni` (`fk_users_dni_dni`),
-  KEY `bookings_room_id` (`fk_rooms_id_name`),
-  KEY `bookings` (`room_type`),
-  CONSTRAINT `bookings_ibfk_1` FOREIGN KEY (`room_type`) REFERENCES `roomtypes` (`id`),
-  CONSTRAINT `bookings_room_id` FOREIGN KEY (`fk_rooms_id_name`) REFERENCES `rooms` (`id`),
-  CONSTRAINT `bookings_user_dni` FOREIGN KEY (`fk_users_dni_dni`) REFERENCES `users` (`dni`)
+  PRIMARY KEY (`id`)
+  -- KEY `bookings_user_dni` (`fk_users_dni_dni`),
+  -- KEY `bookings_room_id` (`fk_rooms_id_name`),
+  -- KEY `bookings` (`room_type`),
+  -- CONSTRAINT `bookings_ibfk_1` FOREIGN KEY (`room_type`) REFERENCES `roomtypes` (`id`),
+  -- CONSTRAINT `bookings_room_id` FOREIGN KEY (`fk_rooms_id_name`) REFERENCES `rooms` (`id`),
+  -- CONSTRAINT `bookings_user_dni` FOREIGN KEY (`fk_users_dni_dni`) REFERENCES `users` (`dni`)
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -101,9 +101,9 @@ CREATE TABLE `rooms` (
   `children_max_number` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `booked` tinyint(4) DEFAULT '0',
-  PRIMARY KEY (`id`),
-  KEY `rooms_types_id_rooms_room_type_id` (`fk_roomtypes_id_name`),
-  CONSTRAINT `rooms_types_id_rooms_room_type_id` FOREIGN KEY (`fk_roomtypes_id_name`) REFERENCES `roomtypes` (`id`)
+  PRIMARY KEY (`id`)
+  -- KEY `rooms_types_id_rooms_room_type_id` (`fk_roomtypes_id_name`),
+  -- CONSTRAINT `rooms_types_id_rooms_room_type_id` FOREIGN KEY (`fk_roomtypes_id_name`) REFERENCES `roomtypes` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 
 -- ----------------------------

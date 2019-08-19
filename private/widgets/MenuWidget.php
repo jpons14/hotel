@@ -43,7 +43,7 @@ CODE;
     }
 
     private function addForNonMembers() {
-        if( $GLOBALS[ 'usersPermission' ][ $this->vars[ 'userType' ] ] == $GLOBALS[ 'usersPermission' ][ 'non-member' ] ) {
+        if($this->user->isNotmember()) {
             $this->return .= <<<CODE
                 <li class="nav-item"><a class="nav-link" href="$GLOBALS[formAction]/users/login">Login</a></li>
                 <li class="nav-item"><a class="nav-link" href="$GLOBALS[formAction]/bookings/loginByDNIForm">Your Bookings</a></li>
@@ -52,7 +52,7 @@ CODE;
     }
 
     private function addForMembers() {
-        if( $GLOBALS[ 'usersPermission' ][ $this->vars[ 'userType' ] ] >= $GLOBALS[ 'usersPermission' ][ 'member' ] ) {
+        if( $this->user->isMember()) {
             $this->return .= <<<CODE
                 <li class="nav-item"><a class="nav-link" href="$GLOBALS[formAction]/users/doLogout">Log out</a></li>
                 <li class="nav-item"><a class="nav-link active" href="$GLOBALS[formAction]/users/editCurrent">Edit User</a></li>
@@ -61,8 +61,10 @@ CODE;
         }
     }
 
+    
+
     private function addForHoteliers() {
-        if( $GLOBALS[ 'usersPermission' ][ $this->vars[ 'userType' ] ] >= $GLOBALS[ 'usersPermission' ][ 'hotelier' ] ) {
+        if($this->user->isHotelier()) {
             $this->return .= <<<CODE
                          <li class="nav-item"><a class="nav-link" href="$GLOBALS[formAction]/users/allUsers">All Users</a></li>
                          <li class="nav-item"><a class="nav-link" href="$GLOBALS[formAction]/rooms/index"><b>Rooms</b></a></li>
@@ -73,13 +75,17 @@ CODE;
         }
     }
 
+    
+
     private function addForRoots() {
-        if( $GLOBALS[ 'usersPermission' ][ $this->vars[ 'userType' ] ] >= $GLOBALS[ 'usersPermission' ][ 'root' ] ) {
+        if($this->user->isRoot()) {
             $this->return .= <<<CODE
                 <li class="nav-item"><a class="nav-link" href="$GLOBALS[formAction]/bookings/index">All Bookings</a></li>
 CODE;
         }
     }
+
+    
 
     public function __toString() {
 

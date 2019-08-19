@@ -46,6 +46,7 @@
                 });
                 $('.js-example-basic-multiple').select2({
                     data: result,
+                    placeholder: 'Regimens'
                 });
             },
             error: function (errData) {
